@@ -1,0 +1,46 @@
+{
+  "name": "Rate My Dawson",
+  "manifest_version": 2,
+  "version": "1.0.1",
+  "description": "Integrate RateMyTeachers ratings into the Dawson Registration Guide",
+  "permissions" : [
+    "declarativeContent"
+  ],
+  "background": {
+    "scripts": ["js/backgroundHTTP.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "icons/RMD-19.png",
+      "38": "icons/RMD-38.png"
+    },
+    "default_popup": "popup/quicklinksMenu.html"
+  },
+  "icons": {
+    "16": "icons/RMD-16.png",
+    "48": "icons/RMD-48.png",
+    "128": "icons/RMD-128.png"
+  },
+  "content_scripts" : [
+    {
+      "matches" : [
+        "*://timetable.dawsoncollege.qc.ca*",
+        "*://dawsoncollege.omnivox.ca*", 
+        "*://ca.ratemyteachers.com*", 
+        "*://www.ratemyprofessors.com*"
+      ],
+      "js" : [
+        "lib/jquery-1.11.2.min.js", 
+        "lib/tooltipsy.min.js", 
+        "lib/levenshtein.js", 
+        "js/init.js"
+      ]
+    }
+  ]
+}
+
+
+
+
+
