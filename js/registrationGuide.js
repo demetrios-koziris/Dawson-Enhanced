@@ -19,42 +19,48 @@ function integrateRatings() {
 
 	debugLog('Running integrateRatings');
 
-	var courses = [];
+	var oldTeachers = null;
 
 	// select the target node
 	var target = document.querySelector('#result-message');
 
 	// create an observer instance
 	var observer = new MutationObserver(function(mutations) {  
-	  mutations.forEach(function(mutation) {
+	  	mutations.forEach(function(mutation) {
 
-	    newCourses = document.getElementsByClassName('section-details');
-	    if (newCourses.length > 0 && newCourses != courses) {
-	    	courses = newCourses;
-	    	
-	    	teachers = {};
-	    	for (var i = 0; i < courses.length; i++) {
-	    		rows = courses[i].getElementsByTagName('li');
-	    		for (var r = 0; r < rows.length; r++) {
-	    			if (rows[r].children[0].innerText == 'Teacher') {
-	    				teacher = rows[r].children[1];
-	    				teacherName = teacher.innerText;
-	    				if (!teacherName.match(/\d+/g)) {
-		    				if (teachers[teacherName]) {
-		    					teachers[teacherName].push(teacher);
-		    				}
-		    				else {
-		    					teachers[teacherName] = [teacher];
-		    				}
+		    courses = document.getElementsByClassName('section-details');
+
+		    if (courses.length > 0){//} && newCourses != courses) {
+		    	
+		    	newTeachers = {};
+		    	for (var i = 0; i < courses.length; i++) {
+		    		rows = courses[i].getElementsByTagName('li');
+		    		for (var r = 0; r < rows.length; r++) {
+		    			if (rows[r].children[0].innerText == 'Teacher') {
+		    				teacher = rows[r].children[1];
+		    				teacherName = teacher.innerText;
+		    				if (!teacherName.match(/\d+/g)) {
+			    				if (newTeachers[teacherName]) {
+			    					newTeachers[teacherName].push(teacher);
+			    				}
+			    				else {
+			    					newTeachers[teacherName] = [teacher];
+			    				}
+			    			}
+			    			break;
 		    			}
-		    			break;
-	    			}
-	    		}
-	    	}
-	    	debugLog(teachers);
-	    	debugLog('Load ratings for ' + Object.keys(teachers).length + ' teachers');
-	    }
-	  });    
+		    		}
+		    	}
+
+		    	if (JSON.stringify(oldTeachers) !== JSON.stringify(newTeachers)) {
+		    		oldTeachers = newTeachers;
+			    	console.log(newTeachers);
+			    	console.log('Load ratings for ' + Object.keys(newTeachers).length + ' teachers');
+			    }
+		    }
+		    
+
+	  	});    
 	});
 
 	// configuration of the observer:
@@ -64,3 +70,5 @@ function integrateRatings() {
 	observer.observe(target, config);
 
 }
+
+
