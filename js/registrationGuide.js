@@ -47,6 +47,7 @@ function integrateRatings() {
 		    					teachers[teacherName] = [teacher];
 		    				}
 		    			}
+		    			break;
 	    			}
 	    		}
 	    	}
