@@ -19,8 +19,9 @@ function integrateRatings() {
 
 	debugLog('Running integrateRatings');
 
-	var oldTeachers = null;
-	var mutationCount = 0;
+	teacherRatings = {};
+	teacherElements = {};
+	mutationCount = 0;
 
 	// select the target node
 	let target = document.querySelector('#result-message');
@@ -31,47 +32,10 @@ function integrateRatings() {
 	  		mutationCount++;
 	  		debugLog('mutation count: ' + mutationCount);
 
-
-		    courses = document.getElementsByClassName('section-details');
-
-		    if (courses.length > 0){//} && newCourses != courses) {
-		    	
-		    	newTeachers = {};
-		    	for (let i = 0; i < courses.length; i++) {
-		    		rows = courses[i].getElementsByTagName('li');
-		    		for (let r = 0; r < rows.length; r++) {
-		    			if (rows[r].children[0].innerText == 'Teacher') {
-		    				teacher = rows[r].children[1];
-		    				teacherName = teacher.innerText;
-		    				if (!teacherName.match(/\d+/g)) {
-			    				if (newTeachers[teacherName]) {
-			    					newTeachers[teacherName].push(teacher);
-			    				}
-			    				else {
-			    					newTeachers[teacherName] = [teacher];
-			    				}
-			    			}
-			    			break;
-		    			}
-		    		}
-		    	}
-
-		    	if (JSON.stringify(oldTeachers) !== JSON.stringify(newTeachers)) {
-		    		oldTeachers = newTeachers;
-			    	debugLog(newTeachers);
-			    	debugLog('Load ratings for ' + Object.keys(newTeachers).length + ' teachers');
-
-					for (var key in oldTeachers) {
-						divs = oldTeachers[key];
-						for (let i = 0; i < divs.length; i++) {
-							divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
-						}
-					}
-
-			    }
-
-		    }
-		    
+	  		if (mutationCount % 2 === 0) {
+	  			teacherElements = {};
+	  			parseTeachers();
+	  		}
 
 	  	});    
 	});
@@ -85,3 +49,98 @@ function integrateRatings() {
 }
 
 
+function parseTeachers() {
+
+	courses = document.getElementsByClassName('section-details');
+    if (courses.length > 0) {
+    	
+    	for (let i = 0; i < courses.length; i++) {
+    		rows = courses[i].getElementsByTagName('li');
+    		for (let r = 0; r < rows.length; r++) {
+    			if (rows[r].children[0].innerText == 'Teacher') {
+    				teacher = rows[r].children[1];
+    				teacherName = teacher.innerText;
+    				teacherKey = teacherName.replace(/\s/g, "-");
+    				teacher.id = teacherKey;
+    				if (!teacherKey.match(/\d+/g)) {
+	    				if (teacherElements[teacherKey]) {
+	    					teacherElements[teacherKey].elements.push(teacher);
+	    				}
+	    				else {
+	    					teacherElements[teacherKey] = {
+	    						name: teacherName, 
+	    						elements: [teacher], 
+	    						ratings: {}
+	    					};
+	    				}
+	    			}
+	    			break;
+    			}
+    		}
+    	}
+    	loadRatings();
+    }
+}
+
+
+function loadRatings() {
+	debugLog(teacherElements);
+    debugLog('Load ratings for ' + Object.keys(teacherElements).length + ' teachers');
+
+	for (var key in teacherElements) {
+
+		getTeacherURL(key, teacherElements[key].name);
+
+		divs = teacherElements[key].elements;
+		for (let i = 0; i < divs.length; i++) {
+			divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
+		}
+	}
+}
+
+
+function getTeacherURL(teacherKey, teacherName) {
+
+    let tooltipContent = '';
+    let teacherSearchURL = 'http://ca.ratemyteachers.com/search_page?q=' + teacherName + '+dawson&search=teachers&state=qc';
+    let testURL = 'https://www.google.ca/search?q=ratemyteachers+dawson+college+quebec+' + teacherName;
+
+    const xmlRequestInfo = {
+        method: 'GET',
+        action: 'xhttp',
+        url: testURL,
+    };
+
+    chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
+        try {
+            if (data.responseXML == 'error') {
+                console.log(data);
+                tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
+                updateTeacherElements(teacherName, teacherSearchURL, tooltipContent);
+            } 
+            else {
+            	console.log(teacherName);
+                let teacherURL = data.url;
+                const htmlParser = new DOMParser();
+                const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
+                // console.log(htmlDoc);
+                // const searchResults = htmlDoc.getElementById('CSE_search');
+                // console.log(searchResults);
+                // const searchResults = htmlDoc.getElementById('content');
+                // console.log(searchResults);
+                const searchResults = htmlDoc.getElementsByClassName('r')[0];
+                console.log(searchResults);
+            }
+        } 
+        catch(err) {
+            console.log('Error: ' + teacherName + '\n' + err.stack);
+            tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
+            updateTeacherElements(teacherName, teacherSearchURL, tooltipContent);
+        }
+    });
+}
+
+
+function updateTeacherElements(name, url, content) {
+
+}
