@@ -1,13 +1,16 @@
 {
   "name": "Rate My Dawson",
   "manifest_version": 2,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Integrate RateMyTeachers ratings into the Dawson Registration Guide",
   "permissions" : [
     "declarativeContent"
   ],
   "background": {
-    "scripts": ["js/backgroundHTTP.js"],
+    "scripts": [
+      "js/backgroundHTTP.js",
+      "js/background.js"
+    ],
     "persistent": false
   },
   "browser_action": {
@@ -34,6 +37,7 @@
         "lib/jquery-1.11.2.min.js", 
         "lib/tooltipsy.min.js", 
         "lib/levenshtein.js", 
+        "js/registrationGuide.js",
         "js/init.js"
       ]
     }

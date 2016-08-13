@@ -17,14 +17,17 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 
 const url = window.location.href;
 
-window.debugMode = false;
-logForDebug('RateMyDawson Debug mode is ON');
+window.debugMode = true;
+debugLog('RateMyDawson Debug mode is ON');
 
+debugLog('Running RateMyDawson');
 
-alert('Running RateMyDawson');
+if (url.match(/.+timetable\.dawsoncollege.+/)) {
+	integrateRatings();
+}
 
-function logForDebug(toLog) {
+function debugLog(message) {
     if (debugMode) {
-        console.log(toLog);
+        console.log(message);
     }
 }
