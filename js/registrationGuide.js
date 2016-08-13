@@ -20,22 +20,26 @@ function integrateRatings() {
 	debugLog('Running integrateRatings');
 
 	var oldTeachers = null;
+	var mutationCount = 0;
 
 	// select the target node
-	var target = document.querySelector('#result-message');
+	let target = document.querySelector('#result-message');
 
 	// create an observer instance
-	var observer = new MutationObserver(function(mutations) {  
+	let observer = new MutationObserver(function(mutations) {  
 	  	mutations.forEach(function(mutation) {
+	  		mutationCount++;
+	  		debugLog('mutation count: ' + mutationCount);
+
 
 		    courses = document.getElementsByClassName('section-details');
 
 		    if (courses.length > 0){//} && newCourses != courses) {
 		    	
 		    	newTeachers = {};
-		    	for (var i = 0; i < courses.length; i++) {
+		    	for (let i = 0; i < courses.length; i++) {
 		    		rows = courses[i].getElementsByTagName('li');
-		    		for (var r = 0; r < rows.length; r++) {
+		    		for (let r = 0; r < rows.length; r++) {
 		    			if (rows[r].children[0].innerText == 'Teacher') {
 		    				teacher = rows[r].children[1];
 		    				teacherName = teacher.innerText;
@@ -54,9 +58,18 @@ function integrateRatings() {
 
 		    	if (JSON.stringify(oldTeachers) !== JSON.stringify(newTeachers)) {
 		    		oldTeachers = newTeachers;
-			    	console.log(newTeachers);
-			    	console.log('Load ratings for ' + Object.keys(newTeachers).length + ' teachers');
+			    	debugLog(newTeachers);
+			    	debugLog('Load ratings for ' + Object.keys(newTeachers).length + ' teachers');
+
+					for (var key in oldTeachers) {
+						divs = oldTeachers[key];
+						for (let i = 0; i < divs.length; i++) {
+							divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
+						}
+					}
+
 			    }
+
 		    }
 		    
 
@@ -64,7 +77,7 @@ function integrateRatings() {
 	});
 
 	// configuration of the observer:
-	var config = { attributes: true, childList: false, characterData: true };
+	let config = { attributes: true, childList: false, characterData: true };
 
 	// pass in the target node, as well as the observer options
 	observer.observe(target, config);
