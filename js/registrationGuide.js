@@ -60,15 +60,15 @@ function parseTeachers() {
     			if (rows[r].children[0].innerText == 'Teacher') {
     				teacher = rows[r].children[1];
     				teacherName = teacher.innerText;
-    				teacherKey = teacherName.replace(/\s/g, "-");
-    				teacher.id = teacherKey;
+    				teacherNameObj = generateTeacherNameObject(teacherName);
+    				teacherKey = teacherNameObj.fullNameKey
     				if (!teacherKey.match(/\d+/g)) {
 	    				if (teacherElements[teacherKey]) {
 	    					teacherElements[teacherKey].elements.push(teacher);
 	    				}
 	    				else {
 	    					teacherElements[teacherKey] = {
-	    						name: teacherName, 
+	    						nameObj: teacherNameObj, 
 	    						elements: [teacher], 
 	    						ratings: {}
 	    					};
@@ -89,7 +89,7 @@ function loadRatings() {
 
 	for (var key in teacherElements) {
 
-		getTeacherURL(key, teacherElements[key].name);
+		getTeacherURL(teacherElements[key].nameObj, true);
 
 		divs = teacherElements[key].elements;
 		for (let i = 0; i < divs.length; i++) {
@@ -99,16 +99,19 @@ function loadRatings() {
 }
 
 
-function getTeacherURL(teacherKey, teacherName) {
+function getTeacherURL(teacherNameObj, fullNameSearch) {
 
     let tooltipContent = '';
-    let teacherSearchURL = 'http://ca.ratemyteachers.com/search_page?q=' + teacherName + '+dawson&search=teachers&state=qc';
-    let testURL = 'https://www.google.ca/search?q=ratemyteachers+dawson+college+quebec+' + teacherName;
+    let teacherSearchURL = 'http://ca.ratemyteachers.com/dawson-college/38432-s?q=';
+    if (fullNameSearch) {
+    	teacherSearchURL += teacherNameObj.firstName + '+';
+    }
+    teacherSearchURL += teacherNameObj.lastName;
 
     const xmlRequestInfo = {
         method: 'GET',
         action: 'xhttp',
-        url: testURL,
+        url: teacherSearchURL,
     };
 
     chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
@@ -116,26 +119,20 @@ function getTeacherURL(teacherKey, teacherName) {
             if (data.responseXML == 'error') {
                 console.log(data);
                 tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-                updateTeacherElements(teacherName, teacherSearchURL, tooltipContent);
+                updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
             } 
             else {
-            	console.log(teacherName);
                 let teacherURL = data.url;
                 const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
-                // console.log(htmlDoc);
-                // const searchResults = htmlDoc.getElementById('CSE_search');
-                // console.log(searchResults);
-                // const searchResults = htmlDoc.getElementById('content');
-                // console.log(searchResults);
-                const searchResults = htmlDoc.getElementsByClassName('r')[0];
+                const searchResults = htmlDoc.getElementsByClassName('teacher_name')[0];
                 console.log(searchResults);
             }
         } 
         catch(err) {
-            console.log('Error: ' + teacherName + '\n' + err.stack);
+            console.log('Error: ' + teacherNameObj.firstName + ' ' + teacherNameObj.lastName + '\n' + err.stack);
             tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-            updateTeacherElements(teacherName, teacherSearchURL, tooltipContent);
+            updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
         }
     });
 }
@@ -143,4 +140,17 @@ function getTeacherURL(teacherKey, teacherName) {
 
 function updateTeacherElements(name, url, content) {
 
+}
+
+
+function generateTeacherNameObject(origName) {
+    const name = origName.trim();
+    const splitName = name.split(' ');
+    const profName = {
+        fullNameKey: name.replace(/\W/g, ''),
+        fullName: name,
+        firstName: splitName[0],
+        lastName: splitName[splitName.length-1]
+    };
+    return profName;
 }
