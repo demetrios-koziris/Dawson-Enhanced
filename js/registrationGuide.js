@@ -71,10 +71,8 @@ function parseTeachers() {
                     ratingsRow = document.createElement('li');
                     ratingsRow.setAttribute('class', 'row');
 
-                    html = '<label class="col-md-2">Ratings</label>';
-                    html += '<div class="col-md-10 schedule">';
+                    html = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
 
-                    html += '<div id="loadingDiv" style="padding: 6px 0px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
                     
 
                     // html += '<div class="ratings-summary">Average 4.09 based on 27 professor ratings </div>';
@@ -96,7 +94,6 @@ function parseTeachers() {
                     // html += '<td>Exam Difficulty</td>';
                     // html += '</tr></tbody>';
                     // html += '</table>';
-                    html += '</div>';
 
                     ratingsRow.innerHTML = html;
                     courses[i].insertBefore(ratingsRow, rows[r+1]);
@@ -133,12 +130,14 @@ function loadRatings() {
     for (let i = 0; i < teacherElementKeys.length; i++) {
         key = teacherElementKeys[i];
 		
-		// divs = teacherData[key].elements;
-		// for (let i = 0; i < divs.length; i++) {
+		divs = teacherData[key].elements;
+		for (let i = 0; i < divs.length; i++) {
+            divs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
+
   //           divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
 		// 	divs[i].innerHTML = '<a href="http://www.google.ca"><b>' + divs[i].innerHTML + '</b></a>';
   //           divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
-		// }
+		}
 
   //       $('.' + key).tooltipsy( {
   //           offset: [-160, 0],
@@ -360,12 +359,13 @@ function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
 
     
 
-    // const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
-    // for (let p = 0; p < teacherElements.length; p++) {
+    const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+    for (let p = 0; p < teacherElements.length; p++) {
     //     teacherElements[p].id = teacherNameObj.fullNameKey + p;
     //     $('#' + teacherNameObj.fullNameKey + p).data('tooltipsy').destroy();
     //     teacherElements[p].title = tooltipContent;
-    // }
+        teacherElements[p].innerHTML = tooltipContent;
+    }
 
     // $('.' + teacherNameObj.fullNameKey).tooltipsy( {
     //     offset: [-160, 0],
