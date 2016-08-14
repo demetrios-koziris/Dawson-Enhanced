@@ -102,7 +102,7 @@ function loadRatings() {
 		divs = teacherData[key].elements;
 		for (let i = 0; i < divs.length; i++) {
             divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
-			divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
+			divs[i].innerHTML = '<a href="http://www.google.ca"><b>' + divs[i].innerHTML + '</b></a>';
             divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
 		}
 
@@ -110,9 +110,9 @@ function loadRatings() {
             offset: [-160, 0],
             css: {
                 padding: '10px',
-                backgroundColor: '#DEE3EA',
+                backgroundColor: '#FFFFFF',
                 borderRadius: '8px',
-                border: '1px solid'
+                border: '2px solid #0E3565'
             }
         });
 
@@ -293,7 +293,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                                          '<br>' + rating.helpfulness + ' Helpfulness' +
                                          '<br>' + rating.clarity + ' Clarity' +
                                          '<br>' + rating.knowledge + ' Knowledge' +
-                                         '<br>' + rating.textbookUse + ' TextbookUse' +
+                                         '<br>' + rating.textbookUse + ' Textbook Use' +
                                          '<br>' + rating.examDifficulty + ' Exam Difficulty' +
                                          '<br><b>From ' + rating.numOfRatings + ' Rating' + (rating.numOfRatings > 1 ? 's' : '') + '</b>';
                     }
@@ -338,9 +338,9 @@ function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
         offset: [-160, 0],
         css: {
             padding: '10px',
-            backgroundColor: '#DEE3EA',
+            backgroundColor: '#FFFFFF',
             borderRadius: '8px',
-            border: '1px solid'
+            border: '2px solid #0E3565'
         }
     });
 
