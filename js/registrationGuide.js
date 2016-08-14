@@ -63,20 +63,54 @@ function parseTeachers() {
             }
     		rows = courses[i].getElementsByTagName('li');
     		for (let r = 0; r < rows.length; r++) {
-    			if (rows[r].children[0].innerText == 'Teacher') {
-    				teacher = rows[r].children[1];
-    				teacherName = teacher.innerText;
-    				teacherNameObj = generateTeacherNameObject(teacherName);
-    				teacherKey = teacherNameObj.fullNameKey;
+    			if (rows[r].firstElementChild.innerText == 'Teacher') {
+                    teacherName = rows[r].children[1].innerText;
+                    teacherNameObj = generateTeacherNameObject(teacherName);
+                    teacherKey = teacherNameObj.fullNameKey;
+
+                    ratingsRow = document.createElement('li');
+                    ratingsRow.setAttribute('class', 'row');
+
+                    html = '<label class="col-md-2">Ratings</label>';
+                    html += '<div class="col-md-10 schedule">';
+
+                    html += '<div id="loadingDiv" style="padding: 6px 0px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
+                    
+
+                    // html += '<div class="ratings-summary">Average 4.09 based on 27 professor ratings </div>';
+                    // html += '<table class="ratings-table" style="table-layout: fixed;">';
+                    // html += '<tbody><tr>';
+                    // html += '<td>4</td>';
+                    // html += '<td>4</td>';
+                    // html += '<td>2</td>';
+                    // html += '<td>3</td>';
+                    // html += '<td>4</td>';
+                    // html += '<td>3</td>';
+                    // html += '</tr></tbody>';
+                    // html += '<tbody><tr>';
+                    // html += '<td>Easiness</td>';
+                    // html += '<td>Helpfulness</td>';
+                    // html += '<td>Clarity</td>';
+                    // html += '<td>Easiness</td>';
+                    // html += '<td>Textbook Use</td>';
+                    // html += '<td>Exam Difficulty</td>';
+                    // html += '</tr></tbody>';
+                    // html += '</table>';
+                    html += '</div>';
+
+                    ratingsRow.innerHTML = html;
+                    courses[i].insertBefore(ratingsRow, rows[r+1]);
+                    ratingsElement = ratingsRow.children[1];
+
     				if (!teacherKey.match(/\d+/g)) {
 	    				if (teacherData[teacherKey]) {
-	    					teacherData[teacherKey].elements.push(teacher);
+	    					teacherData[teacherKey].elements.push(ratingsElement);
                             teacherData[teacherKey].elementColors.push(elementColor);
 	    				}
 	    				else {
 	    					teacherData[teacherKey] = {
 	    						nameObj: teacherNameObj, 
-	    						elements: [teacher], 
+	    						elements: [ratingsElement], 
                                 elementColors: [elementColor],
 	    						ratings: {}
 	    					};
@@ -99,22 +133,22 @@ function loadRatings() {
     for (let i = 0; i < teacherElementKeys.length; i++) {
         key = teacherElementKeys[i];
 		
-		divs = teacherData[key].elements;
-		for (let i = 0; i < divs.length; i++) {
-            divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
-			divs[i].innerHTML = '<a href="http://www.google.ca"><b>' + divs[i].innerHTML + '</b></a>';
-            divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
-		}
+		// divs = teacherData[key].elements;
+		// for (let i = 0; i < divs.length; i++) {
+  //           divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
+		// 	divs[i].innerHTML = '<a href="http://www.google.ca"><b>' + divs[i].innerHTML + '</b></a>';
+  //           divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
+		// }
 
-        $('.' + key).tooltipsy( {
-            offset: [-160, 0],
-            css: {
-                padding: '10px',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '8px',
-                border: '2px solid #0E3565'
-            }
-        });
+  //       $('.' + key).tooltipsy( {
+  //           offset: [-160, 0],
+  //           css: {
+  //               padding: '10px',
+  //               backgroundColor: '#FFFFFF',
+  //               borderRadius: '8px',
+  //               border: '2px solid #0E3565'
+  //           }
+  //       });
 
         getTeacherURL(teacherData[key].nameObj, true);
 	}
@@ -309,7 +343,6 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
     });
 }
 
-
 function generateTeacherNameObject(origName) {
     const name = origName.trim();
     const splitName = name.split(' ');
@@ -327,21 +360,21 @@ function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
 
     
 
-    const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
-    for (let p = 0; p < teacherElements.length; p++) {
-        teacherElements[p].id = teacherNameObj.fullNameKey + p;
-        $('#' + teacherNameObj.fullNameKey + p).data('tooltipsy').destroy();
-        teacherElements[p].title = tooltipContent;
-    }
+    // const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+    // for (let p = 0; p < teacherElements.length; p++) {
+    //     teacherElements[p].id = teacherNameObj.fullNameKey + p;
+    //     $('#' + teacherNameObj.fullNameKey + p).data('tooltipsy').destroy();
+    //     teacherElements[p].title = tooltipContent;
+    // }
 
-    $('.' + teacherNameObj.fullNameKey).tooltipsy( {
-        offset: [-160, 0],
-        css: {
-            padding: '10px',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '8px',
-            border: '2px solid #0E3565'
-        }
-    });
+    // $('.' + teacherNameObj.fullNameKey).tooltipsy( {
+    //     offset: [-160, 0],
+    //     css: {
+    //         padding: '10px',
+    //         backgroundColor: '#FFFFFF',
+    //         borderRadius: '8px',
+    //         border: '2px solid #0E3565'
+    //     }
+    // });
 
 }
