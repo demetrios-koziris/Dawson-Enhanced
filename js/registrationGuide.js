@@ -103,7 +103,18 @@ function loadRatings() {
 		for (let i = 0; i < divs.length; i++) {
             divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
 			divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
+            divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
 		}
+
+        $('.' + key).tooltipsy( {
+            offset: [-160, 0],
+            css: {
+                padding: '10px',
+                backgroundColor: '#DEE3EA',
+                borderRadius: '8px',
+                border: '1px solid'
+            }
+        });
 
         getTeacherURL(teacherData[key].nameObj, true);
 	}
@@ -223,7 +234,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                     helpfulness: 'ERROR',
                     clarity: 'ERROR',
                     knowledge: 'ERROR',
-                    texbookUse: 'ERROR',
+                    textbookUse: 'ERROR',
                     examDifficulty: 'ERROR',
                     numOfRatings: 'ERROR'
                 };
@@ -235,47 +246,57 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                     tooltipContent = 'Multiple Teacher found<br>Please click to see results';
                 } 
                 else if (resultCode == 1) {
-                    // if (htmlDoc.getElementsByClassName('rating-count')[0] === null) {
-                    //     //check holly dressel in ENVR400(13-14) and Sung Chul Noh in MGCR 222 at https://www.mcgill.ca/study/2012-2013/faculties/engineering/undergraduate/programs/bachelor-engineering-beng-civil-engineering
-                    //     tooltipContent = 'This instructor has no ratings<br>Click to be the first to rate';
-                    // } 
-                    // else {
-                    //     gradeElements = htmlDoc.getElementsByClassName('grade');
-                    //     if (gradeElements[0]) {
-                    //         rating.overall = gradeElements[0].innerText.trim();
-                    //     }
-                    //     if (gradeElements[1]) {
-                    //         rating.takeagain = gradeElements[1].innerText.trim();
-                    //     }
-                    //     if (gradeElements[2]) {
-                    //         rating.difficulty = gradeElements[2].innerText.trim();
-                    //     }
-                    //     if (gradeElements[3]) {
-                    //         rating.hotness = gradeElements[3].innerHTML;
-                    //         if (rating.hotness) {
-                    //             rating.hotness = rating.hotness.match(/chilis\/(?:new-)?([A-Za-z]+)\-chili\.png/)[1];
-                    //         }
-                    //     }
-                    //     if (htmlDoc.getElementsByClassName('pfname')[0]) {
-                    //         rating.firstName = htmlDoc.getElementsByClassName('pfname')[0].innerText.trim();
-                    //     }
-                    //     if (htmlDoc.getElementsByClassName('plname')[0]) {
-                    //         rating.lastName = htmlDoc.getElementsByClassName('plname')[0].innerText.trim();
-                    //     }
-                    //     if (htmlDoc.getElementsByClassName('rating-count')[0]) {
-                    //         rating.numOfRatings = htmlDoc.getElementsByClassName('rating-count')[0].innerText.match(/([0-9]+) Student Ratings/)[1];
-                    //     }
+                    
+                    if (htmlDoc.getElementsByClassName('rating-summary').length < 2) {
+                        //See Vincenzo Lentini: http://ca.ratemyteachers.com/vince-lentini/6135115-t
+                        tooltipContent = 'This instructor has no ratings<br>Click to be the first to rate';
+                    } 
+                    else {
+                        nameElem = htmlDoc.getElementsByClassName('teacher_name')[0];
+                        if (nameElem) {
+                            rating.fullName = nameElem.innerText.trim();
+                        }
+                        ratingElem = htmlDoc.getElementsByClassName('rating-summary')[0];
+                        if (ratingElem) {
+                            ratingSummary = ratingElem.innerText.split('\n');
+                            rating.overall = ratingSummary[2];
+                            rating.numOfRatings = ratingSummary[4];
+                        }
+                        easinessElem = htmlDoc.getElementsByClassName('easy')[0];
+                        if (easinessElem) {
+                            rating.easiness = easinessElem.innerText.trim();
+                        }
+                        helpfulnessElem = htmlDoc.getElementsByClassName('helpful')[0];
+                        if (helpfulnessElem) {
+                            rating.helpfulness = helpfulnessElem.innerText.trim();
+                        }
+                        clarityElem = htmlDoc.getElementsByClassName('clarity')[0];
+                        if (clarityElem) {
+                            rating.clarity = clarityElem.innerText.trim();
+                        }
+                        knowledgeElem = htmlDoc.getElementsByClassName('knowledgeable')[0];
+                        if (knowledgeElem) {
+                            rating.knowledge = knowledgeElem.innerText.trim();
+                        }
+                        textbookUseElem = htmlDoc.getElementsByClassName('textbook_use')[0];
+                        if (textbookUseElem) {
+                            rating.textbookUse = textbookUseElem.innerText.trim();
+                        }
+                        examDifficultyElem = htmlDoc.getElementsByClassName('exam_difficulty')[0];
+                        if (examDifficultyElem) {
+                            rating.examDifficulty = examDifficultyElem.innerText.trim();
+                        }
 
                         tooltipContent = '<b>' + rating.fullName + '</b>' +
-                                         '<br><b>' + rating.overall + '</b> Total Average' +
+                                         '<br><b>' + rating.overall + ' Total Average</b>' +
                                          '<br>' + rating.easiness + ' Easiness' +
                                          '<br>' + rating.helpfulness + ' Helpfulness' +
                                          '<br>' + rating.clarity + ' Clarity' +
                                          '<br>' + rating.knowledge + ' Knowledge' +
-                                         '<br>' + rating.texbookUse + ' TexbookUse' +
+                                         '<br>' + rating.textbookUse + ' TextbookUse' +
                                          '<br>' + rating.examDifficulty + ' Exam Difficulty' +
-                                         '<br>From <b>' + rating.numOfRatings + ' student rating' + (rating.numOfRatings > 1 ? 's' : '') + '</b>';
-                    // }
+                                         '<br><b>From ' + rating.numOfRatings + ' Rating' + (rating.numOfRatings > 1 ? 's' : '') + '</b>';
+                    }
                 }
                 updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
             }
@@ -304,22 +325,23 @@ function generateTeacherNameObject(origName) {
 
 function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
 
+    
+
     const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
     for (let p = 0; p < teacherElements.length; p++) {
+        teacherElements[p].id = teacherNameObj.fullNameKey + p;
+        $('#' + teacherNameObj.fullNameKey + p).data('tooltipsy').destroy();
         teacherElements[p].title = tooltipContent;
     }
 
-    debugLog('Ready for tooltipsy');
     $('.' + teacherNameObj.fullNameKey).tooltipsy( {
         offset: [-160, 0],
         css: {
-            // fontFamily: 'OpenSans',
             padding: '10px',
-            // color: '#444444',
-            // fontSize: '14px',
-            backgroundColor: '#F7F7F7',
+            backgroundColor: '#DEE3EA',
             borderRadius: '8px',
             border: '1px solid'
         }
     });
+
 }
