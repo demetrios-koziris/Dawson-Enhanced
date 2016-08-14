@@ -1,7 +1,7 @@
 {
   "name": "Rate My Dawson",
   "manifest_version": 2,
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Integrate RateMyTeachers ratings into the Dawson Registration Guide",
   "permissions" : [
     "declarativeContent"
@@ -29,8 +29,9 @@
       "matches" : [
         "*://timetable.dawsoncollege.qc.ca/*",
         "*://dawsoncollege.omnivox.ca/*", 
-        "*://ca.ratemyteachers.com/*", 
-        "*://www.ratemyprofessors.com/*"
+        "*://ca.ratemyteachers.com/*",
+        "*://www.ratemyprofessors.com/*",
+        "*://www.google.ca/*"
       ],
       "js" : [
         "lib/jquery-1.11.2.min.js", 

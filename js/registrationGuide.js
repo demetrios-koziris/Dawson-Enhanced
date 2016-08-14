@@ -61,7 +61,7 @@ function parseTeachers() {
     				teacher = rows[r].children[1];
     				teacherName = teacher.innerText;
     				teacherNameObj = generateTeacherNameObject(teacherName);
-    				teacherKey = teacherNameObj.fullNameKey
+    				teacherKey = teacherNameObj.fullNameKey;
     				if (!teacherKey.match(/\d+/g)) {
 	    				if (teacherElements[teacherKey]) {
 	    					teacherElements[teacherKey].elements.push(teacher);
@@ -89,7 +89,7 @@ function loadRatings() {
 
 	for (var key in teacherElements) {
 
-		getTeacherURL(teacherElements[key].nameObj, true);
+		getTeacherURL(teacherElements[key].nameObj);
 
 		divs = teacherElements[key].elements;
 		for (let i = 0; i < divs.length; i++) {
@@ -99,14 +99,11 @@ function loadRatings() {
 }
 
 
-function getTeacherURL(teacherNameObj, fullNameSearch) {
+function getTeacherURL(teacherNameObj) {
 
     let tooltipContent = '';
-    let teacherSearchURL = 'http://ca.ratemyteachers.com/dawson-college/38432-s?q=';
-    if (fullNameSearch) {
-    	teacherSearchURL += teacherNameObj.firstName + '+';
-    }
-    teacherSearchURL += teacherNameObj.lastName;
+    let RMTSearchURL = 'http://ca.ratemyteachers.com/dawson-college/38432-s?q=';
+    let teacherSearchURL = 'https://www.google.ca/search?q=ratemyteachers+dawson+college+quebec+' + teacherNameObj.fullName;
 
     const xmlRequestInfo = {
         method: 'GET',
@@ -125,7 +122,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 let teacherURL = data.url;
                 const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
-                const searchResults = htmlDoc.getElementsByClassName('teacher_name')[0];
+                const searchResults = htmlDoc.getElementsByClassName('r')[0].children[0].href;
                 console.log(searchResults);
             }
         } 
