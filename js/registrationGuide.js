@@ -122,17 +122,63 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
             } 
             else {
+            	
                 let teacherURL = data.url;
                 const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
-                const searchResults = htmlDoc.getElementsByClassName('teacher_name')[0];
-                console.log(searchResults);
+                const searchResults = htmlDoc.getElementsByClassName('teacher_name');
+
+                if (searchResults.length === 0) { 
+                    if (fullNameSearch) {
+                    	// 0 teacher result from fullNameSearch search so try search with just last name
+                    	// console.log(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                        getTeacherURL(teacherNameObj, false);
+                    }
+                    else {
+                        // 0 teacher result from search using just last name
+                        console.log(teacherNameObj.fullName + ': (zero FINAL) ' + teacherURL);
+                        // getTeacherContent(teacherNameObj, teacherURL, 0);
+                    }
+                } 
+                else if (searchResults.length == 1) { 
+                    // 1 teacher result so create url with result
+                    teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
+                    console.log(teacherNameObj.fullName + ': ' + teacherURL);
+                    // getTeacherContent(teacherNameObj, teacherURL, 1);
+                } 
+                else {
+                    //multiple profs so search for exact or close match
+					let teacherFound = false;                    
+					for (let i = 0; i < searchResults.length; i++) {
+                        const resultName = searchResults[i].children[0].getAttribute('href').split('/')[1].replace(/\-/g, ' ');
+                        const resultFirstName = resultName.split(' ')[1].trim(' ');
+                        const nameMatches = (getEditDistance(resultFirstName.toLowerCase(), teacherNameObj.firstName.toLowerCase())<=2 || 
+                                             resultName.toLowerCase().match(teacherNameObj.firstName.toLowerCase()) || 
+                                             teacherNameObj.firstName.toLowerCase().match(resultFirstName.toLowerCase()));
+                        // console.log(resultName);
+                        // console.log(resultFirstName);
+                        // console.log(teacherNameObj);
+                        if (nameMatches){
+                        	teacherFound = true;
+                            teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
+                        }
+                        break;
+                    }
+                    if (teacherFound) {
+                    	console.log(teacherNameObj.fullName + ': (mult)' + teacherURL);
+                    	// getProfContent(teacherNameObj, teacherURL, 1);
+                    }
+                    else {
+                    	console.log(teacherNameObj.fullName + ': (mult NM) ' + teacherURL);
+                    	// getProfContent(teacherNameObj, teacherURL, 2);
+                    }                        
+                }
             }
         } 
         catch(err) {
             console.log('Error: ' + teacherNameObj.firstName + ' ' + teacherNameObj.lastName + '\n' + err.stack);
             tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-            updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+            updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
         }
     });
 }
