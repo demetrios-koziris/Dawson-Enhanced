@@ -20,7 +20,7 @@ function integrateRatings() {
 	debugLog('Running integrateRatings');
 
 	teacherRatings = {};
-	teacherElements = {};
+	teacherData = {};
 	mutationCount = 0;
 
 	// select the target node
@@ -33,7 +33,7 @@ function integrateRatings() {
 	  		debugLog('mutation count: ' + mutationCount);
 
 	  		if (mutationCount % 2 === 0) {
-	  			teacherElements = {};
+	  			teacherData = {};
 	  			parseTeachers();
 	  		}
 
@@ -55,6 +55,12 @@ function parseTeachers() {
     if (courses.length > 0) {
     	
     	for (let i = 0; i < courses.length; i++) {
+            if (window.getComputedStyle(courses[i]).background.match('240')) {
+                elementColor = '#F0F9FF';
+            }
+            else {
+                elementColor = '#F7F7F7';
+            }
     		rows = courses[i].getElementsByTagName('li');
     		for (let r = 0; r < rows.length; r++) {
     			if (rows[r].children[0].innerText == 'Teacher') {
@@ -63,13 +69,15 @@ function parseTeachers() {
     				teacherNameObj = generateTeacherNameObject(teacherName);
     				teacherKey = teacherNameObj.fullNameKey;
     				if (!teacherKey.match(/\d+/g)) {
-	    				if (teacherElements[teacherKey]) {
-	    					teacherElements[teacherKey].elements.push(teacher);
+	    				if (teacherData[teacherKey]) {
+	    					teacherData[teacherKey].elements.push(teacher);
+                            teacherData[teacherKey].elementColors.push(elementColor);
 	    				}
 	    				else {
-	    					teacherElements[teacherKey] = {
+	    					teacherData[teacherKey] = {
 	    						nameObj: teacherNameObj, 
 	    						elements: [teacher], 
+                                elementColors: [elementColor],
 	    						ratings: {}
 	    					};
 	    				}
@@ -84,18 +92,20 @@ function parseTeachers() {
 
 
 function loadRatings() {
-	debugLog(teacherElements);
-    debugLog('Load ratings for ' + Object.keys(teacherElements).length + ' teachers');
+	debugLog(teacherData);
+    debugLog('Load ratings for ' + Object.keys(teacherData).length + ' teachers');
 
-    teacherElementKeys = Object.keys(teacherElements);
+    teacherElementKeys = Object.keys(teacherData);
     for (let i = 0; i < teacherElementKeys.length; i++) {
         key = teacherElementKeys[i];
-		getTeacherURL(teacherElements[key].nameObj, true);
-
-		divs = teacherElements[key].elements;
+		
+		divs = teacherData[key].elements;
 		for (let i = 0; i < divs.length; i++) {
+            divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
 			divs[i].innerHTML = '<b>' + divs[i].innerHTML + '</b>';
 		}
+
+        getTeacherURL(teacherData[key].nameObj, true);
 	}
 }
 
@@ -137,15 +147,15 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                     }
                     else {
                         // 0 teacher result from search using just last name
-                        console.log(teacherNameObj.fullName + ': (zero FINAL) ' + teacherURL);
-                        // getTeacherContent(teacherNameObj, teacherURL, 0);
+                        console.log(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                        getTeacherContent(teacherNameObj, teacherURL, 0);
                     }
                 } 
                 else if (searchResults.length == 1) { 
                     // 1 teacher result so create url with result
                     teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
                     console.log(teacherNameObj.fullName + ': ' + teacherURL);
-                    // getTeacherContent(teacherNameObj, teacherURL, 1);
+                    getTeacherContent(teacherNameObj, teacherURL, 1);
                 } 
                 else {
                     //multiple profs so search for exact or close match
@@ -163,18 +173,18 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                         break;
                     }
                     if (teacherFound) {
-                    	console.log(teacherNameObj.fullName + ': (mult)' + teacherURL);
-                    	// getProfContent(teacherNameObj, teacherURL, 1);
+                    	console.log(teacherNameObj.fullName + ': ' + teacherURL);
+                    	getTeacherContent(teacherNameObj, teacherURL, 1);
                     }
                     else {
-                    	console.log(teacherNameObj.fullName + ': (mult NM) ' + teacherURL);
-                    	// getProfContent(teacherNameObj, teacherURL, 2);
+                    	console.log(teacherNameObj.fullName + ': (mult) ' + teacherURL);
+                    	getTeacherContent(teacherNameObj, teacherURL, 2);
                     }                        
                 }
             }
         } 
         catch(err) {
-            console.log('Error: ' + teacherNameObj.firstName + ' ' + teacherNameObj.lastName + '\n' + err.stack);
+            console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
             tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
             updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
         }
@@ -182,8 +192,100 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
 }
 
 
-function updateTeacherElements(name, url, content) {
+function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
 
+    // updateProfURL(profName.fullNameKey, profURL);
+    const xmlRequestInfo = {
+        method: 'GET',
+        action: 'xhttp',
+        url: teacherURL,
+    };
+    let tooltipContent = '';
+
+    chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
+        try {
+
+            if (data.responseXML == 'error') {
+                console.log(data);
+                tooltipContent = 'Ratemyprofessors data failed to load<br>Please refresh the page to try again';
+                updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+            } 
+            else {
+                let teacherURL = data.url;
+
+                const htmlParser = new DOMParser();
+                const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
+
+                const rating = {
+                    fullName: 'ERROR',
+                    overall: 'ERROR',
+                    easiness: 'ERROR',
+                    helpfulness: 'ERROR',
+                    clarity: 'ERROR',
+                    knowledge: 'ERROR',
+                    texbookUse: 'ERROR',
+                    examDifficulty: 'ERROR',
+                    numOfRatings: 'ERROR'
+                };
+                
+                if (resultCode === 0) {
+                    tooltipContent = 'Teacher not found<br>Please click to search RMT';
+                } 
+                else if (resultCode == 2) {
+                    tooltipContent = 'Multiple Teacher found<br>Please click to see results';
+                } 
+                else if (resultCode == 1) {
+                    // if (htmlDoc.getElementsByClassName('rating-count')[0] === null) {
+                    //     //check holly dressel in ENVR400(13-14) and Sung Chul Noh in MGCR 222 at https://www.mcgill.ca/study/2012-2013/faculties/engineering/undergraduate/programs/bachelor-engineering-beng-civil-engineering
+                    //     tooltipContent = 'This instructor has no ratings<br>Click to be the first to rate';
+                    // } 
+                    // else {
+                    //     gradeElements = htmlDoc.getElementsByClassName('grade');
+                    //     if (gradeElements[0]) {
+                    //         rating.overall = gradeElements[0].innerText.trim();
+                    //     }
+                    //     if (gradeElements[1]) {
+                    //         rating.takeagain = gradeElements[1].innerText.trim();
+                    //     }
+                    //     if (gradeElements[2]) {
+                    //         rating.difficulty = gradeElements[2].innerText.trim();
+                    //     }
+                    //     if (gradeElements[3]) {
+                    //         rating.hotness = gradeElements[3].innerHTML;
+                    //         if (rating.hotness) {
+                    //             rating.hotness = rating.hotness.match(/chilis\/(?:new-)?([A-Za-z]+)\-chili\.png/)[1];
+                    //         }
+                    //     }
+                    //     if (htmlDoc.getElementsByClassName('pfname')[0]) {
+                    //         rating.firstName = htmlDoc.getElementsByClassName('pfname')[0].innerText.trim();
+                    //     }
+                    //     if (htmlDoc.getElementsByClassName('plname')[0]) {
+                    //         rating.lastName = htmlDoc.getElementsByClassName('plname')[0].innerText.trim();
+                    //     }
+                    //     if (htmlDoc.getElementsByClassName('rating-count')[0]) {
+                    //         rating.numOfRatings = htmlDoc.getElementsByClassName('rating-count')[0].innerText.match(/([0-9]+) Student Ratings/)[1];
+                    //     }
+
+                        tooltipContent = '<b>' + rating.fullName + '</b>' +
+                                         '<br><b>' + rating.overall + '</b> Total Average' +
+                                         '<br>' + rating.easiness + ' Easiness' +
+                                         '<br>' + rating.helpfulness + ' Helpfulness' +
+                                         '<br>' + rating.clarity + ' Clarity' +
+                                         '<br>' + rating.knowledge + ' Knowledge' +
+                                         '<br>' + rating.texbookUse + ' TexbookUse' +
+                                         '<br>' + rating.examDifficulty + ' Exam Difficulty' +
+                                         '<br>From <b>' + rating.numOfRatings + ' student rating' + (rating.numOfRatings > 1 ? 's' : '') + '</b>';
+                    // }
+                }
+                updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+            }
+        } 
+        catch(err) {
+            console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
+            tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
+            updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+        }
+    });
 }
 
 
@@ -197,4 +299,27 @@ function generateTeacherNameObject(origName) {
         lastName: splitName[splitName.length-1]
     };
     return profName;
+}
+
+
+function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
+
+    const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+    for (let p = 0; p < teacherElements.length; p++) {
+        teacherElements[p].title = tooltipContent;
+    }
+
+    debugLog('Ready for tooltipsy');
+    $('.' + teacherNameObj.fullNameKey).tooltipsy( {
+        offset: [-160, 0],
+        css: {
+            // fontFamily: 'OpenSans',
+            padding: '10px',
+            // color: '#444444',
+            // fontSize: '14px',
+            backgroundColor: '#F7F7F7',
+            borderRadius: '8px',
+            border: '1px solid'
+        }
+    });
 }
