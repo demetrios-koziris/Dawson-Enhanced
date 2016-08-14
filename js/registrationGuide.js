@@ -61,7 +61,7 @@ function parseTeachers() {
     				teacher = rows[r].children[1];
     				teacherName = teacher.innerText;
     				teacherNameObj = generateTeacherNameObject(teacherName);
-    				teacherKey = teacherNameObj.fullNameKey
+    				teacherKey = teacherNameObj.fullNameKey;
     				if (!teacherKey.match(/\d+/g)) {
 	    				if (teacherElements[teacherKey]) {
 	    					teacherElements[teacherKey].elements.push(teacher);
@@ -87,8 +87,9 @@ function loadRatings() {
 	debugLog(teacherElements);
     debugLog('Load ratings for ' + Object.keys(teacherElements).length + ' teachers');
 
-	for (var key in teacherElements) {
-
+    teacherElementKeys = Object.keys(teacherElements);
+    for (let i = 0; i < teacherElementKeys.length; i++) {
+        key = teacherElementKeys[i];
 		getTeacherURL(teacherElements[key].nameObj, true);
 
 		divs = teacherElements[key].elements;
@@ -155,9 +156,6 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                         const nameMatches = (getEditDistance(resultFirstName.toLowerCase(), teacherNameObj.firstName.toLowerCase())<=2 || 
                                              resultName.toLowerCase().match(teacherNameObj.firstName.toLowerCase()) || 
                                              teacherNameObj.firstName.toLowerCase().match(resultFirstName.toLowerCase()));
-                        // console.log(resultName);
-                        // console.log(resultFirstName);
-                        // console.log(teacherNameObj);
                         if (nameMatches){
                         	teacherFound = true;
                             teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
