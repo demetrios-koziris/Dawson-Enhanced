@@ -57,12 +57,7 @@ function parseTeachers() {
     if (courses.length > 0) {
     	
     	for (let i = 0; i < courses.length; i++) {
-            if (window.getComputedStyle(courses[i]).background.match('240')) {
-                elementColor = '#F0F9FF';
-            }
-            else {
-                elementColor = '#F7F7F7';
-            }
+
     		rows = courses[i].getElementsByTagName('li');
     		for (let r = 0; r < rows.length; r++) {
     			if (rows[r].firstElementChild.innerText.match('Teacher')) {
@@ -82,13 +77,11 @@ function parseTeachers() {
 
     	    				if (teacherData[teacherKey]) {
     	    					teacherData[teacherKey].elements.push(ratingsElement);
-                                teacherData[teacherKey].elementColors.push(elementColor);
     	    				}
     	    				else {
     	    					teacherData[teacherKey] = {
     	    						nameObj: teacherNameObj, 
     	    						elements: [ratingsElement], 
-                                    elementColors: [elementColor],
     	    					};
     	    				}
                             
@@ -320,7 +313,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.examDifficulty = examDifficultyElem.innerText.trim();
                         }
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;"><a href="' + teacherURL + '">';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;"><a href="' + teacherURL + '" target="_blank">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
                         tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
@@ -357,6 +350,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
     });
 }
 
+
 function generateTeacherNameObject(origName) {
     const name = origName.trim();
     const splitName = name.split(' ');
@@ -380,16 +374,18 @@ function updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipCont
     }
 }
 
+
 function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].setAttribute('class', 'col-md-10');
-            linkHTML = '<a href="' + teacherURL + '">' + message + '</a>';   
+            linkHTML = '<a href="' + teacherURL + '" target="_blank">' + message + '</a>';   
             teacherElements[p].innerHTML = linkHTML;
         }
     }
 }
+
 
 function updateSavedTeacherRatings(teacherNameObj, teacherURL, content, code) {
     if (code === -1) {
