@@ -29,10 +29,12 @@ function integrateRatings() {
 	// create an observer instance
 	let observer = new MutationObserver(function(mutations) {  
 	  	mutations.forEach(function(mutation) {
-	  		mutationCount++;
-	  		debugLog('mutation count: ' + mutationCount);
+            mutationCount++;
 
 	  		if (mutationCount % 2 === 0) {
+                debugLog('mutation count: ' + mutationCount);
+                console.log(teacherRatings);
+
 	  			teacherData = {};
 	  			parseTeachers();
 	  		}
@@ -63,33 +65,36 @@ function parseTeachers() {
             }
     		rows = courses[i].getElementsByTagName('li');
     		for (let r = 0; r < rows.length; r++) {
-    			if (rows[r].firstElementChild.innerText == 'Teacher') {
-                    teacherName = rows[r].children[1].innerText;
-                    teacherNameObj = generateTeacherNameObject(teacherName);
-                    teacherKey = teacherNameObj.fullNameKey;
+    			if (rows[r].firstElementChild.innerText.match('Teacher')) {
 
-    				if (!teacherKey.match(/\d+/g)) {
+                    teachers = rows[r].children[1].innerText.split(',');
+                    for (let t = 0; t < teachers.length; t++) {
+                        teacherName = teachers[t].trim();
+                        teacherNameObj = generateTeacherNameObject(teacherName);
+                        teacherKey = teacherNameObj.fullNameKey;
 
-                        ratingsRow = document.createElement('li');
-                        ratingsRow.setAttribute('class', 'row');
-                        ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
-                        courses[i].insertBefore(ratingsRow, rows[r+1]);
-                        ratingsElement = ratingsRow.children[1];
+        				if (!teacherKey.match(/\d+/g)) {
+                            ratingsRow = document.createElement('li');
+                            ratingsRow.setAttribute('class', 'row');
+                            ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10"><div>';
+                            courses[i].insertBefore(ratingsRow, rows[r+1]);
+                            ratingsElement = ratingsRow.children[1];
 
-	    				if (teacherData[teacherKey]) {
-	    					teacherData[teacherKey].elements.push(ratingsElement);
-                            teacherData[teacherKey].elementColors.push(elementColor);
-	    				}
-	    				else {
-	    					teacherData[teacherKey] = {
-	    						nameObj: teacherNameObj, 
-	    						elements: [ratingsElement], 
-                                elementColors: [elementColor],
-	    						ratings: {}
-	    					};
-	    				}
-	    			}
-	    			break;
+    	    				if (teacherData[teacherKey]) {
+    	    					teacherData[teacherKey].elements.push(ratingsElement);
+                                teacherData[teacherKey].elementColors.push(elementColor);
+    	    				}
+    	    				else {
+    	    					teacherData[teacherKey] = {
+    	    						nameObj: teacherNameObj, 
+    	    						elements: [ratingsElement], 
+                                    elementColors: [elementColor],
+    	    					};
+    	    				}
+                            
+    	    			}
+                    }
+                    break;
     			}
     		}
     	}
@@ -111,7 +116,27 @@ function loadRatings() {
             divs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
 		}
 
-        getTeacherURL(teacherData[key].nameObj, true);
+        if (teacherRatings[key]) {
+            savedRatings = teacherRatings[key];
+            if (savedRatings.code === 1) {
+                console.log(key);
+                updateTeacherElementsWithRating(savedRatings.nameObj, savedRatings.URL, savedRatings.content);
+            }
+            else if (savedRatings.code > -1) {
+                updateTeacherElementsWithMessage(savedRatings.nameObj, savedRatings.URL, savedRatings.content);
+            }
+        }
+        else {
+            ratingData = {
+                code: -1,
+                nameObj: null,
+                URL: null,
+                content: null
+            };
+            teacherRatings[key] = ratingData;
+
+            getTeacherURL(teacherData[key].nameObj, true);
+        }
 	}
 }
 
@@ -135,8 +160,9 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         try {
             if (data.responseXML == 'error') {
                 console.log(data);
-                tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-                updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
+                tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
             } 
             else {
             	
@@ -191,8 +217,9 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         } 
         catch(err) {
             console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-            updateTeacherElements(teacherNameObj, teacherSearchURL, tooltipContent);
+            tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
         }
     });
 }
@@ -213,8 +240,9 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
 
             if (data.responseXML == 'error') {
                 console.log(data);
-                tooltipContent = 'Ratemyprofessors data failed to load<br>Please refresh the page to try again';
-                updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+                tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
             } 
             else {
                 let teacherURL = data.url;
@@ -236,16 +264,24 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 };
                 
                 if (resultCode === 0) {
-                    tooltipContent = 'Teacher not found<br>Please click to search RMT';
+                    tooltipContent = 'Teacher ' + teacherNameObj.fullName + ' not found. Please click to search RMT.';
+                    updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 0);
+                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+
                 } 
                 else if (resultCode == 2) {
-                    tooltipContent = 'Multiple Teacher found<br>Please click to see results';
+                    tooltipContent = 'Multiple teachers found for ' + teacherNameObj.fullName + '. Please click to see results.';
+                    updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 2);
+                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+
                 } 
                 else if (resultCode == 1) {
                     
                     if (htmlDoc.getElementsByClassName('rating-summary').length < 2) {
                         //See Vincenzo Lentini: http://ca.ratemyteachers.com/vince-lentini/6135115-t
-                        tooltipContent = 'This instructor has no ratings<br>Click to be the first to rate';
+                        tooltipContent = 'Teacher ' + teacherNameObj.fullName + ' has no ratings. Please click to be the first to rate.';
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 0);
+                        updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
                     } 
                     else {
                         nameElem = htmlDoc.getElementsByClassName('teacher_name')[0];
@@ -284,8 +320,8 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.examDifficulty = examDifficultyElem.innerText.trim();
                         }
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">' 
-                        tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ' 
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">';
+                        tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
                         tooltipContent += '</div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
@@ -306,15 +342,17 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         tooltipContent += '</tr></tbody>';
                         tooltipContent += '</table>';
 
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 1);
+                        updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipContent);
                     }
-                }
-                updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+                }                
             }
         } 
         catch(err) {
             console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            tooltipContent = 'RateMyTeacher data failed to load<br>Please click submit to reattempt';
-            updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
+            tipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
         }
     });
 }
@@ -332,11 +370,38 @@ function generateTeacherNameObject(origName) {
 }
 
 
-function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
-
-    const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
-    for (let p = 0; p < teacherElements.length; p++) {
-        teacherElements[p].innerHTML = tooltipContent;
+function updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipContent) {
+    if (teacherData[teacherNameObj.fullNameKey]) {
+        const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+        for (let p = 0; p < teacherElements.length; p++) {
+            teacherElements[p].setAttribute('class', 'col-md-10 schedule');
+            teacherElements[p].innerHTML = tooltipContent;
+        }
     }
+}
 
+function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
+    if (teacherData[teacherNameObj.fullNameKey]) {
+        const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+        for (let p = 0; p < teacherElements.length; p++) {
+            linkHTML = '<a href="' + teacherURL + '">' + message + '</a>';   
+            teacherElements[p].innerHTML = linkHTML;
+        }
+    }
+}
+
+function updateSavedTeacherRatings(teacherNameObj, teacherURL, content, code) {
+    if (code === -1) {
+        console.log('DELETE ' + teacherNameObj.fullName);
+        delete teacherRatings[teacherNameObj.fullNameKey];
+    }
+    else {
+        ratingData = {
+            code: code,
+            nameObj: teacherNameObj,
+            URL: teacherURL,
+            content: content
+        };
+        teacherRatings[teacherNameObj.fullNameKey] = ratingData;
+    }
 }
