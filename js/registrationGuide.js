@@ -76,7 +76,7 @@ function parseTeachers() {
         				if (!teacherKey.match(/\d+/g)) {
                             ratingsRow = document.createElement('li');
                             ratingsRow.setAttribute('class', 'row');
-                            ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10"><div>';
+                            ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
                             courses[i].insertBefore(ratingsRow, rows[r+1]);
                             ratingsElement = ratingsRow.children[1];
 
@@ -320,10 +320,10 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.examDifficulty = examDifficultyElem.innerText.trim();
                         }
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;"><a href="' + teacherURL + '">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
-                        tooltipContent += '</div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
+                        tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
                         tooltipContent += '<td style="text-align: center;">' + rating.easiness + '</td>';
                         tooltipContent += '<td style="text-align: center;">' + rating.helpfulness + '</td>';
@@ -384,6 +384,7 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
+            teacherElements[p].setAttribute('class', 'col-md-10');
             linkHTML = '<a href="' + teacherURL + '">' + message + '</a>';   
             teacherElements[p].innerHTML = linkHTML;
         }
