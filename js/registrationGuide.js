@@ -71,31 +71,8 @@ function parseTeachers() {
                     ratingsRow = document.createElement('li');
                     ratingsRow.setAttribute('class', 'row');
 
-                    html = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
+                    ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
 
-                    
-
-                    // html += '<div class="ratings-summary">Average 4.09 based on 27 professor ratings </div>';
-                    // html += '<table class="ratings-table" style="table-layout: fixed;">';
-                    // html += '<tbody><tr>';
-                    // html += '<td>4</td>';
-                    // html += '<td>4</td>';
-                    // html += '<td>2</td>';
-                    // html += '<td>3</td>';
-                    // html += '<td>4</td>';
-                    // html += '<td>3</td>';
-                    // html += '</tr></tbody>';
-                    // html += '<tbody><tr>';
-                    // html += '<td>Easiness</td>';
-                    // html += '<td>Helpfulness</td>';
-                    // html += '<td>Clarity</td>';
-                    // html += '<td>Easiness</td>';
-                    // html += '<td>Textbook Use</td>';
-                    // html += '<td>Exam Difficulty</td>';
-                    // html += '</tr></tbody>';
-                    // html += '</table>';
-
-                    ratingsRow.innerHTML = html;
                     courses[i].insertBefore(ratingsRow, rows[r+1]);
                     ratingsElement = ratingsRow.children[1];
 
@@ -133,21 +110,7 @@ function loadRatings() {
 		divs = teacherData[key].elements;
 		for (let i = 0; i < divs.length; i++) {
             divs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
-
-  //           divs[i].setAttribute('class', divs[i].getAttribute('class') + ' ' + key);
-		// 	divs[i].innerHTML = '<a href="http://www.google.ca"><b>' + divs[i].innerHTML + '</b></a>';
-  //           divs[i].title = '<b>RateMyDawson is loading ratings!</b>';
 		}
-
-  //       $('.' + key).tooltipsy( {
-  //           offset: [-160, 0],
-  //           css: {
-  //               padding: '10px',
-  //               backgroundColor: '#FFFFFF',
-  //               borderRadius: '8px',
-  //               border: '2px solid #0E3565'
-  //           }
-  //       });
 
         getTeacherURL(teacherData[key].nameObj, true);
 	}
@@ -261,6 +224,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
 
                 const rating = {
+                    summary: 'ERROR',
                     fullName: 'ERROR',
                     overall: 'ERROR',
                     easiness: 'ERROR',
@@ -294,6 +258,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             ratingSummary = ratingElem.innerText.split('\n');
                             rating.overall = ratingSummary[2];
                             rating.numOfRatings = ratingSummary[4];
+                            // rating.summary = ratingElem.innerText.replace(/\n/g, ' ');
                         }
                         easinessElem = htmlDoc.getElementsByClassName('easy')[0];
                         if (easinessElem) {
@@ -320,15 +285,27 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.examDifficulty = examDifficultyElem.innerText.trim();
                         }
 
-                        tooltipContent = '<b>' + rating.fullName + '</b>' +
-                                         '<br><b>' + rating.overall + ' Total Average</b>' +
-                                         '<br>' + rating.easiness + ' Easiness' +
-                                         '<br>' + rating.helpfulness + ' Helpfulness' +
-                                         '<br>' + rating.clarity + ' Clarity' +
-                                         '<br>' + rating.knowledge + ' Knowledge' +
-                                         '<br>' + rating.textbookUse + ' Textbook Use' +
-                                         '<br>' + rating.examDifficulty + ' Exam Difficulty' +
-                                         '<br><b>From ' + rating.numOfRatings + ' Rating' + (rating.numOfRatings > 1 ? 's' : '') + '</b>';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">' + rating.fullName + ': <b>';
+                        tooltipContent += rating.overall + '</b> average based on ' + rating.numOfRatings + ' professor ratings';
+                        tooltipContent += '</div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
+                        tooltipContent += '<tbody><tr>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.easiness + '</td>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.helpfulness + '</td>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.clarity + '</td>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.knowledge + '</td>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.textbookUse + '</td>';
+                        tooltipContent += '<td style="text-align: center;">' + rating.examDifficulty + '</td>';
+                        tooltipContent += '</tr></tbody>';
+                        tooltipContent += '<tbody><tr>';
+                        tooltipContent += '<td style="text-align: center;">Easiness</td>';
+                        tooltipContent += '<td style="text-align: center;">Helpfulness</td>';
+                        tooltipContent += '<td style="text-align: center;">Clarity</td>';
+                        tooltipContent += '<td style="text-align: center;">Knowledge</td>';
+                        tooltipContent += '<td style="text-align: center;">Textbook Use</td>';
+                        tooltipContent += '<td style="text-align: center;">Exam Difficulty</td>';
+                        tooltipContent += '</tr></tbody>';
+                        tooltipContent += '</table>';
+
                     }
                 }
                 updateTeacherElements(teacherNameObj, teacherURL, tooltipContent);
@@ -357,24 +334,9 @@ function generateTeacherNameObject(origName) {
 
 function updateTeacherElements(teacherNameObj, teacherURL, tooltipContent) {
 
-    
-
     const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
     for (let p = 0; p < teacherElements.length; p++) {
-    //     teacherElements[p].id = teacherNameObj.fullNameKey + p;
-    //     $('#' + teacherNameObj.fullNameKey + p).data('tooltipsy').destroy();
-    //     teacherElements[p].title = tooltipContent;
         teacherElements[p].innerHTML = tooltipContent;
     }
-
-    // $('.' + teacherNameObj.fullNameKey).tooltipsy( {
-    //     offset: [-160, 0],
-    //     css: {
-    //         padding: '10px',
-    //         backgroundColor: '#FFFFFF',
-    //         borderRadius: '8px',
-    //         border: '2px solid #0E3565'
-    //     }
-    // });
 
 }
