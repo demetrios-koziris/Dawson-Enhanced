@@ -68,15 +68,14 @@ function parseTeachers() {
                     teacherNameObj = generateTeacherNameObject(teacherName);
                     teacherKey = teacherNameObj.fullNameKey;
 
-                    ratingsRow = document.createElement('li');
-                    ratingsRow.setAttribute('class', 'row');
-
-                    ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
-
-                    courses[i].insertBefore(ratingsRow, rows[r+1]);
-                    ratingsElement = ratingsRow.children[1];
-
     				if (!teacherKey.match(/\d+/g)) {
+
+                        ratingsRow = document.createElement('li');
+                        ratingsRow.setAttribute('class', 'row');
+                        ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
+                        courses[i].insertBefore(ratingsRow, rows[r+1]);
+                        ratingsElement = ratingsRow.children[1];
+
 	    				if (teacherData[teacherKey]) {
 	    					teacherData[teacherKey].elements.push(ratingsElement);
                             teacherData[teacherKey].elementColors.push(elementColor);
@@ -285,8 +284,9 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.examDifficulty = examDifficultyElem.innerText.trim();
                         }
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">' + rating.fullName + ': <b>';
-                        tooltipContent += rating.overall + '</b> average based on ' + rating.numOfRatings + ' professor ratings';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;">' 
+                        tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ' 
+                        tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
                         tooltipContent += '</div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
                         tooltipContent += '<td style="text-align: center;">' + rating.easiness + '</td>';
