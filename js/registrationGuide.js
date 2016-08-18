@@ -87,10 +87,10 @@ function parseTeachers() {
                             
     	    			}
                     }
-                    break;
     			}
     		}
     	}
+
     	loadRatings();
     }
 }
@@ -102,17 +102,13 @@ function loadRatings() {
 
     teacherElementKeys = Object.keys(teacherData);
     for (let i = 0; i < teacherElementKeys.length; i++) {
-        key = teacherElementKeys[i];
-		
-		divs = teacherData[key].elements;
-		for (let i = 0; i < divs.length; i++) {
-            divs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
-		}
+        teacherKey = teacherElementKeys[i];
+        setLoadingGif(teacherKey);
 
-        if (teacherRatings[key]) {
-            savedRatings = teacherRatings[key];
+        if (teacherRatings[teacherKey]) {
+            savedRatings = teacherRatings[teacherKey];
             if (savedRatings.code === 1) {
-                console.log(key);
+                console.log(teacherKey);
                 updateTeacherElementsWithRating(savedRatings.nameObj, savedRatings.URL, savedRatings.content);
             }
             else if (savedRatings.code > -1) {
@@ -120,17 +116,18 @@ function loadRatings() {
             }
         }
         else {
-            ratingData = {
-                code: -1,
-                nameObj: null,
-                URL: null,
-                content: null
-            };
-            teacherRatings[key] = ratingData;
-
-            getTeacherURL(teacherData[key].nameObj, true);
+            teacherRatings[teacherKey] = {code: -1, nameObj: null, URL: null, content: null };
+            getTeacherURL(teacherData[teacherKey].nameObj, true);
         }
 	}
+}
+
+
+function setLoadingGif(teacherKey) {
+    teacherDivs = teacherData[teacherKey].elements;
+    for (let i = 0; i < teacherDivs.length; i++) {
+        teacherDivs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
+    }
 }
 
 
@@ -277,10 +274,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
                     } 
                     else {
-                        nameElem = htmlDoc.getElementsByClassName('teacher_name')[0];
-                        if (nameElem) {
-                            rating.fullName = nameElem.innerText.trim();
-                        }
+                        
                         ratingElem = htmlDoc.getElementsByClassName('rating-summary')[0];
                         if (ratingElem) {
                             ratingSummary = ratingElem.innerText.split('\n');
@@ -288,30 +282,13 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.numOfRatings = ratingSummary[4];
                             // rating.summary = ratingElem.innerText.replace(/\n/g, ' ');
                         }
-                        easinessElem = htmlDoc.getElementsByClassName('easy')[0];
-                        if (easinessElem) {
-                            rating.easiness = easinessElem.innerText.trim();
-                        }
-                        helpfulnessElem = htmlDoc.getElementsByClassName('helpful')[0];
-                        if (helpfulnessElem) {
-                            rating.helpfulness = helpfulnessElem.innerText.trim();
-                        }
-                        clarityElem = htmlDoc.getElementsByClassName('clarity')[0];
-                        if (clarityElem) {
-                            rating.clarity = clarityElem.innerText.trim();
-                        }
-                        knowledgeElem = htmlDoc.getElementsByClassName('knowledgeable')[0];
-                        if (knowledgeElem) {
-                            rating.knowledge = knowledgeElem.innerText.trim();
-                        }
-                        textbookUseElem = htmlDoc.getElementsByClassName('textbook_use')[0];
-                        if (textbookUseElem) {
-                            rating.textbookUse = textbookUseElem.innerText.trim();
-                        }
-                        examDifficultyElem = htmlDoc.getElementsByClassName('exam_difficulty')[0];
-                        if (examDifficultyElem) {
-                            rating.examDifficulty = examDifficultyElem.innerText.trim();
-                        }
+                        rating.fullName = parseRatingData(htmlDoc, 'teacher_name')
+                        rating.easiness = parseRatingData(htmlDoc, 'easy')
+                        rating.helpfulness = parseRatingData(htmlDoc, 'helpful')
+                        rating.clarity = parseRatingData(htmlDoc, 'clarity')
+                        rating.knowledge = parseRatingData(htmlDoc, 'knowledgeable')
+                        rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use')
+                        rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty')
 
                         tooltipContent = '<div class="ratings-summary" style="line-height: 1;"><a href="' + teacherURL + '" target="_blank">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
@@ -337,11 +314,19 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
         } 
         catch(err) {
             console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            tipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+            tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
             updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
         }
     });
+}
+
+
+function parseRatingData(htmlDoc, className) {
+    ratingElem = htmlDoc.getElementsByClassName(className)[0];
+    if (ratingElem) {
+        return ratingElem.innerText.trim();
+    }
 }
 
 
