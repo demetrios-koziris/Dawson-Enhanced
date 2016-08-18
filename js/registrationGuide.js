@@ -60,7 +60,8 @@ function parseTeachers() {
 
     		rows = courses[i].getElementsByTagName('li');
     		for (let r = 0; r < rows.length; r++) {
-    			if (rows[r].firstElementChild.innerText.match('Teacher')) {
+                rowLabel = rows[r].firstElementChild.innerText;
+    			if (rowLabel.match('Teacher')) {
 
                     teachers = rows[r].children[1].innerText.split(',');
                     for (let t = 0; t < teachers.length; t++) {
@@ -88,6 +89,10 @@ function parseTeachers() {
     	    			}
                     }
     			}
+                else if (rowLabel.match('Drop Date')) {
+                    rows[r].firstElementChild.innerText = 'Drop Date';
+                    break;
+                }
     		}
     	}
 
@@ -290,14 +295,14 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use')
                         rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty')
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1;"><a href="' + teacherURL + '" target="_blank">';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
                         tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
                         ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
                         for (let i = 0; i < ratingDataKeys.length; i++) {
-                            tooltipContent += '<td style="text-align: center;">' + rating[ratingDataKeys[i]] + '</td>';
+                            tooltipContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
                         }
                         tooltipContent += '</tr></tbody><tbody><tr>';
                         ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
