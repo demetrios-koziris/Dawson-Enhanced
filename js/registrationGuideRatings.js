@@ -77,7 +77,7 @@ function integrateTeacherRatings() {
 
 function loadRatings() {
 	debugLog(teacherData);
-    debugLog('Load ratings for ' + Object.keys(teacherData).length + ' teachers');
+    debugLog('Loading ratings for ' + Object.keys(teacherData).length + ' teachers');
 
     teacherElementKeys = Object.keys(teacherData);
     for (let i = 0; i < teacherElementKeys.length; i++) {
@@ -196,7 +196,6 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
 
 function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
 
-    // updateProfURL(profName.fullNameKey, profURL);
     const xmlRequestInfo = {
         method: 'GET',
         action: 'xhttp',
@@ -271,7 +270,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
 
                         tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
-                        tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
+                        tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
                         tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
                         ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
