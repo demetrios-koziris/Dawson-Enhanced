@@ -23,4 +23,33 @@ function setupSeatsAvailability() {
 function integrateSeatsAvailability() {
 	debugLog('Running: integrateSeatsAvailability');
 	debugLog(seatsAvailabilityData);
+
+	getSeatsAvailability();
+}
+
+
+function getSeatsAvailability() {
+
+    courseSeatsURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php'
+    const xmlRequestInfo = {
+        method: 'GET',
+        action: 'xhttp',
+        url: courseSeatsURL,
+    };
+
+    chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
+        try {
+            if (data.responseXML == 'error') {
+                debugLog(data);
+            } 
+            else {
+            	const htmlParser = new DOMParser();
+                const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
+                debugLog(htmlDoc);
+            }
+        } 
+        catch(err) {
+            debugLog('Error:\n' + err.stack);
+        }
+    });
 }
