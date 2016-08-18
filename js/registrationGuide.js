@@ -81,7 +81,7 @@ function parseTeachers() {
     	    				else {
     	    					teacherData[teacherKey] = {
     	    						nameObj: teacherNameObj, 
-    	    						elements: [ratingsElement], 
+    	    						elements: [ratingsElement] 
     	    					};
     	    				}
                             
@@ -318,22 +318,16 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's' : '');
                         tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         tooltipContent += '<tbody><tr>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.easiness + '</td>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.helpfulness + '</td>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.clarity + '</td>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.knowledge + '</td>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.textbookUse + '</td>';
-                        tooltipContent += '<td style="text-align: center;">' + rating.examDifficulty + '</td>';
-                        tooltipContent += '</tr></tbody>';
-                        tooltipContent += '<tbody><tr>';
-                        tooltipContent += '<td style="text-align: center;">Easiness</td>';
-                        tooltipContent += '<td style="text-align: center;">Helpfulness</td>';
-                        tooltipContent += '<td style="text-align: center;">Clarity</td>';
-                        tooltipContent += '<td style="text-align: center;">Knowledge</td>';
-                        tooltipContent += '<td style="text-align: center;">Textbook Use</td>';
-                        tooltipContent += '<td style="text-align: center;">Exam Difficulty</td>';
-                        tooltipContent += '</tr></tbody>';
-                        tooltipContent += '</table>';
+                        ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
+                        for (let i = 0; i < ratingDataKeys.length; i++) {
+                            tooltipContent += '<td style="text-align: center;">' + rating[ratingDataKeys[i]] + '</td>';
+                        }
+                        tooltipContent += '</tr></tbody><tbody><tr>';
+                        ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
+                        for (let i = 0; i < ratingLabels.length; i++) {
+                            tooltipContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
+                        }
+                        tooltipContent += '</tr></tbody></table>';
 
                         updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 1);
                         updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipContent);
