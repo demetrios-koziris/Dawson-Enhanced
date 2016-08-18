@@ -23,7 +23,35 @@ debugLog('RateMyDawson Debug mode is ON');
 debugLog('Running RateMyDawson');
 
 if (url.match(/.+timetable\.dawsoncollege.+/)) {
-	integrateRatings();
+
+	setupTeacherRatings();
+	setupSeatsAvailability();
+
+	mutationCount = 0;
+
+	// select the target node
+	let target = document.querySelector('#result-message');
+
+	// create an observer instance
+	let observer = new MutationObserver(function(mutations) {  
+	  	mutations.forEach(function(mutation) {
+            mutationCount++;
+
+	  		if (mutationCount % 2 === 0) {
+                debugLog('mutation count: ' + mutationCount);
+
+	  			integrateTeacherRatings();
+	  			integrateSeatsAvailability();
+	  		}
+
+	  	});    
+	});
+
+	// configuration of the observer:
+	let config = { attributes: true, childList: false, characterData: true };
+
+	// pass in the target node, as well as the observer options
+	observer.observe(target, config);
 }
 
 function debugLog(message) {

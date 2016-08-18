@@ -15,43 +15,17 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 //jshint esversion: 6
 
 
-function integrateRatings() {
-
-	debugLog('Running integrateRatings');
-
+function setupTeacherRatings() {
+	debugLog('Running: setupTeacherRatings');
 	teacherRatings = {};
 	teacherData = {};
-	mutationCount = 0;
-
-	// select the target node
-	let target = document.querySelector('#result-message');
-
-	// create an observer instance
-	let observer = new MutationObserver(function(mutations) {  
-	  	mutations.forEach(function(mutation) {
-            mutationCount++;
-
-	  		if (mutationCount % 2 === 0) {
-                debugLog('mutation count: ' + mutationCount);
-                debugLog(teacherRatings);
-
-	  			teacherData = {};
-	  			parseTeachers();
-	  		}
-
-	  	});    
-	});
-
-	// configuration of the observer:
-	let config = { attributes: true, childList: false, characterData: true };
-
-	// pass in the target node, as well as the observer options
-	observer.observe(target, config);
-
 }
 
 
-function parseTeachers() {
+function integrateTeacherRatings() {
+    debugLog('Running: integrateTeacherRatings');
+    debugLog(teacherRatings);
+    teacherData = {};
 
 	courses = document.getElementsByClassName('section-details');
     if (courses.length > 0) {
@@ -287,13 +261,13 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                             rating.numOfRatings = ratingSummary[4];
                             // rating.summary = ratingElem.innerText.replace(/\n/g, ' ');
                         }
-                        rating.fullName = parseRatingData(htmlDoc, 'teacher_name')
-                        rating.easiness = parseRatingData(htmlDoc, 'easy')
-                        rating.helpfulness = parseRatingData(htmlDoc, 'helpful')
-                        rating.clarity = parseRatingData(htmlDoc, 'clarity')
-                        rating.knowledge = parseRatingData(htmlDoc, 'knowledgeable')
-                        rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use')
-                        rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty')
+                        rating.fullName = parseRatingData(htmlDoc, 'teacher_name');
+                        rating.easiness = parseRatingData(htmlDoc, 'easy');
+                        rating.helpfulness = parseRatingData(htmlDoc, 'helpful');
+                        rating.clarity = parseRatingData(htmlDoc, 'clarity');
+                        rating.knowledge = parseRatingData(htmlDoc, 'knowledgeable');
+                        rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use');
+                        rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty');
 
                         tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
