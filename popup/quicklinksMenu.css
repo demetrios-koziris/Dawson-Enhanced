@@ -1,7 +1,15 @@
+.rmd-menu {
+    background:#E9F3FC; 
+    border-width:2px; 
+    border-style:outset; 
+    border-color:#337AB7; 
+    width:240px; 
+    padding:10px 12px;
+}
 .rmd-title {
     font-family: "CartoGothicStdBold",Helvetica,"Helvetica Neue",Arial,sans serif;
     font-weight: bold;
-    color: #17436B;
+    color: #337AB7;
 }
 .rmd-button {
     border-radius: 3px;
@@ -9,7 +17,7 @@
     cursor: pointer;
     text-align: center;
     margin: 2px 0px;
-    border: 1px solid #707070;
+    border: 1px solid #337AB7;
     width: 100%;
     color: #000;
     background-color: #FFFFFF;
@@ -17,5 +25,5 @@
 .rmd-button:hover {
     color: #000;
     border: 1px solid #000;
-    background: -webkit-linear-gradient(left, #548EC4, #FFFFFF);
+    background: -webkit-linear-gradient(left, #1E9CD9, #FFFFFF);
 }

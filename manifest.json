@@ -1,7 +1,7 @@
 {
   "name": "Rate My Dawson",
   "manifest_version": 2,
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "Integrate RateMyTeachers ratings into the Dawson Registration Guide",
   "permissions" : [
     "declarativeContent"
