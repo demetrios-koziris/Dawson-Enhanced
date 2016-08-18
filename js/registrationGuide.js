@@ -33,7 +33,7 @@ function integrateRatings() {
 
 	  		if (mutationCount % 2 === 0) {
                 debugLog('mutation count: ' + mutationCount);
-                console.log(teacherRatings);
+                debugLog(teacherRatings);
 
 	  			teacherData = {};
 	  			parseTeachers();
@@ -108,7 +108,7 @@ function loadRatings() {
         if (teacherRatings[teacherKey]) {
             savedRatings = teacherRatings[teacherKey];
             if (savedRatings.code === 1) {
-                console.log(teacherKey);
+                debugLog(teacherKey);
                 updateTeacherElementsWithRating(savedRatings.nameObj, savedRatings.URL, savedRatings.content);
             }
             else if (savedRatings.code > -1) {
@@ -149,7 +149,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
     chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
         try {
             if (data.responseXML == 'error') {
-                console.log(data);
+                debugLog(data);
                 tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
                 updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
                 updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
@@ -164,19 +164,19 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 if (searchResults.length === 0) { 
                     if (fullNameSearch) {
                     	// 0 teacher result from fullNameSearch search so try search with just last name
-                    	// console.log(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                    	// debugLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
                         getTeacherURL(teacherNameObj, false);
                     }
                     else {
                         // 0 teacher result from search using just last name
-                        console.log(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                        debugLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
                         getTeacherContent(teacherNameObj, teacherURL, 0);
                     }
                 } 
                 else if (searchResults.length == 1) { 
                     // 1 teacher result so create url with result
                     teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
-                    console.log(teacherNameObj.fullName + ': ' + teacherURL);
+                    debugLog(teacherNameObj.fullName + ': ' + teacherURL);
                     getTeacherContent(teacherNameObj, teacherURL, 1);
                 } 
                 else {
@@ -195,18 +195,18 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                         break;
                     }
                     if (teacherFound) {
-                    	console.log(teacherNameObj.fullName + ': ' + teacherURL);
+                    	debugLog(teacherNameObj.fullName + ': ' + teacherURL);
                     	getTeacherContent(teacherNameObj, teacherURL, 1);
                     }
                     else {
-                    	console.log(teacherNameObj.fullName + ': (mult) ' + teacherURL);
+                    	debugLog(teacherNameObj.fullName + ': (mult) ' + teacherURL);
                     	getTeacherContent(teacherNameObj, teacherURL, 2);
                     }                        
                 }
             }
         } 
         catch(err) {
-            console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
+            debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
             tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
             updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
@@ -229,7 +229,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
         try {
 
             if (data.responseXML == 'error') {
-                console.log(data);
+                debugLog(data);
                 tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
                 updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
                 updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
@@ -313,7 +313,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
             }
         } 
         catch(err) {
-            console.log('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
+            debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
             tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
             updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
@@ -368,7 +368,7 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
 
 function updateSavedTeacherRatings(teacherNameObj, teacherURL, content, code) {
     if (code === -1) {
-        console.log('DELETE ' + teacherNameObj.fullName);
+        debugLog('DELETE ' + teacherNameObj.fullName);
         delete teacherRatings[teacherNameObj.fullNameKey];
     }
     else {
