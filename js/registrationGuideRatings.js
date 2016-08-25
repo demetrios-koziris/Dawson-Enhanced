@@ -268,7 +268,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use');
                         rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty');
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank">';
+                        tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
                         tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
                         tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
@@ -337,7 +337,7 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].setAttribute('class', 'col-md-10');
-            linkHTML = '<a href="' + teacherURL + '" target="_blank">' + message + '</a>';   
+            linkHTML = '<a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">' + message + '</a>';   
             teacherElements[p].innerHTML = linkHTML;
         }
     }
