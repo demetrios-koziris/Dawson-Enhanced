@@ -1,2 +1,2 @@
 # RateMyDawson
-Chrome Extension integrating Rate My Teachers ratings into the Dawson Registration Guide
+Chrome Extension integrating teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
