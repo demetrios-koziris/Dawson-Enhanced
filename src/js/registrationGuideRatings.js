@@ -1,5 +1,5 @@
 /*
-RateMyDawson is a chrome extension that integrates RateMyTeachers ratings into the Dawson Registration Guide
+RateMyDawson is a chrome extension that integrates teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
 Copyright (C) 2016 Demetrios Koziris
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
@@ -19,6 +19,7 @@ function setupTeacherRatings() {
 	debugLog('Running: setupTeacherRatings');
 	teacherRatings = {};
 	teacherData = {};
+    failedMessage = 'Ratings data failed to load. Please click Search to reload.';
 }
 
 
@@ -130,9 +131,8 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         try {
             if (data.responseXML == 'error') {
                 debugLog(data);
-                ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-                updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
-                updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, ratingsContent);
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, failedMessage);
             } 
             else {
             	
@@ -187,9 +187,8 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         } 
         catch(err) {
             debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-            updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
-            updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, ratingsContent);
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, failedMessage);
         }
     });
 }
@@ -209,9 +208,8 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
 
             if (data.responseXML == 'error') {
                 debugLog(data);
-                ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-                updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
-                updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherURL, failedMessage);
             } 
             else {
                 let teacherURL = data.url;
@@ -293,9 +291,8 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
         } 
         catch(err) {
             debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-            updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
-            updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherURL, failedMessage);
         }
     });
 }
