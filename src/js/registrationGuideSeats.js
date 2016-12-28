@@ -46,7 +46,8 @@ function integrateSeatsAvailability() {
 
                     if (courseNumber in seatsAvailabilityData) {
                         if (section in seatsAvailabilityData[courseNumber]) {
-                            sectionVal.innerHTML += "  (" + seatsAvailabilityData[courseNumber][section] + " Seats Available)";
+
+                            sectionVal.innerHTML += '  <a href="https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php" target="_blank" rel="noopener noreferrer">(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)</a>';
                         }
                     }
                 }
