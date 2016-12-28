@@ -64,6 +64,7 @@ function integrateTeacherRatings() {
                     }
     			}
                 else if (rowLabel.match('Drop Date')) {
+                    // rename row label to Drop Date instead of Course Drop Date so it takes only 1 line
                     rows[r].firstElementChild.innerText = 'Drop Date';
                     break;
                 }
@@ -112,7 +113,7 @@ function setLoadingGif(teacherKey) {
 
 function getTeacherURL(teacherNameObj, fullNameSearch) {
 
-    let tooltipContent = '';
+    let ratingsContent = '';
     let teacherSearchURL = 'http://ca.ratemyteachers.com/dawson-college/38432-s?q=';
     if (fullNameSearch) {
     	teacherSearchURL += teacherNameObj.firstName + '+';
@@ -129,9 +130,9 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         try {
             if (data.responseXML == 'error') {
                 debugLog(data);
-                tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-                updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
-                updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
+                ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, ratingsContent);
             } 
             else {
             	
@@ -186,9 +187,9 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         } 
         catch(err) {
             debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-            updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
-            updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, tooltipContent);
+            ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, ratingsContent);
         }
     });
 }
@@ -201,16 +202,16 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
         action: 'xhttp',
         url: teacherURL,
     };
-    let tooltipContent = '';
+    let ratingsContent = '';
 
     chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
         try {
 
             if (data.responseXML == 'error') {
                 debugLog(data);
-                tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-                updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
-                updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+                ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+                updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
+                updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
             } 
             else {
                 let teacherURL = data.url;
@@ -232,24 +233,24 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 };
                 
                 if (resultCode === 0) {
-                    tooltipContent = 'Teacher ' + teacherNameObj.fullName + ' not found. Please click to search RMT.';
-                    updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 0);
-                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+                    ratingsContent = 'Teacher ' + teacherNameObj.fullName + ' not found. Please click to search RMT.';
+                    updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 0);
+                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
 
                 } 
                 else if (resultCode == 2) {
-                    tooltipContent = 'Multiple teachers found for ' + teacherNameObj.fullName + '. Please click to see results.';
-                    updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 2);
-                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+                    ratingsContent = 'Multiple teachers found for ' + teacherNameObj.fullName + '. Please click to see results.';
+                    updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 2);
+                    updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
 
                 } 
                 else if (resultCode == 1) {
                     
                     if (htmlDoc.getElementsByClassName('rating-summary').length < 2) {
                         //See Vincenzo Lentini: http://ca.ratemyteachers.com/vince-lentini/6135115-t
-                        tooltipContent = 'Teacher ' + teacherNameObj.fullName + ' has no ratings. Please click to be the first to rate.';
-                        updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 0);
-                        updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+                        ratingsContent = 'Teacher ' + teacherNameObj.fullName + ' has no ratings. Please click to be the first to rate.';
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 0);
+                        updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
                     } 
                     else {
                         
@@ -268,33 +269,33 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use');
                         rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty');
 
-                        tooltipContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
-                        tooltipContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
-                        tooltipContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
-                        tooltipContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
-                        tooltipContent += '<tbody><tr>';
+                        ratingsContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
+                        ratingsContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
+                        ratingsContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
+                        ratingsContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
+                        ratingsContent += '<tbody><tr>';
                         ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
                         for (let i = 0; i < ratingDataKeys.length; i++) {
-                            tooltipContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
+                            ratingsContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
                         }
-                        tooltipContent += '</tr></tbody><tbody><tr>';
+                        ratingsContent += '</tr></tbody><tbody><tr>';
                         ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
                         for (let i = 0; i < ratingLabels.length; i++) {
-                            tooltipContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
+                            ratingsContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
                         }
-                        tooltipContent += '</tr></tbody></table>';
+                        ratingsContent += '</tr></tbody></table>';
 
-                        updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, 1);
-                        updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipContent);
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 1);
+                        updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsContent);
                     }
                 }                
             }
         } 
         catch(err) {
             debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            tooltipContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
-            updateSavedTeacherRatings(teacherNameObj, teacherURL, tooltipContent, -1);
-            updateTeacherElementsWithMessage(teacherNameObj, teacherURL, tooltipContent);
+            ratingsContent = 'RateMyTeacher data failed to load. Please click Search to reload.';
+            updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, -1);
+            updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
         }
     });
 }
@@ -321,12 +322,12 @@ function generateTeacherNameObject(origName) {
 }
 
 
-function updateTeacherElementsWithRating(teacherNameObj, teacherURL, tooltipContent) {
+function updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsContent) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].setAttribute('class', 'col-md-10 schedule');
-            teacherElements[p].innerHTML = tooltipContent;
+            teacherElements[p].innerHTML = ratingsContent;
         }
     }
 }

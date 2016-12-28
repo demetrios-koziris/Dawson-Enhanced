@@ -25,7 +25,7 @@ debugLog('Running RateMyDawson');
 if (url.match(/.+timetable\.dawsoncollege.+/)) {
 
 	setupTeacherRatings();
-	// setupSeatsAvailability();
+	setupSeatsAvailability();
 
 	mutationCount = 0;
 
@@ -40,8 +40,9 @@ if (url.match(/.+timetable\.dawsoncollege.+/)) {
 	  		if (mutationCount % 2 === 0) {
                 debugLog('mutation count: ' + mutationCount);
 
+                integrateSeatsAvailability();
 	  			integrateTeacherRatings();
-	  			// integrateSeatsAvailability();
+	  			
 	  		}
 
 	  	});    

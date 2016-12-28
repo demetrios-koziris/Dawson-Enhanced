@@ -18,19 +18,47 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 function setupSeatsAvailability() {
 	debugLog('Running: setupSeatsAvailability');
 	seatsAvailabilityData = {};
+    getSeatsAvailability();
 }
 
 function integrateSeatsAvailability() {
 	debugLog('Running: integrateSeatsAvailability');
 	debugLog(seatsAvailabilityData);
 
-	getSeatsAvailability();
+    
+    coursesWraps = document.getElementsByClassName('course-wrap');
+    coursesNumbers = document.getElementsByClassName('cnumber');
+
+    if (coursesWraps.length > 0) {
+        
+        for (let i= 0; i < coursesWraps.length; i++) {
+            const courseNumber = coursesNumbers[i].innerText;
+            const rows = coursesWraps[i].getElementsByTagName('li');
+            for (let r = 0; r < rows.length; r++) {
+
+                rowLabel = rows[r].firstElementChild.innerText;
+                if (rowLabel.match('Section Title')) {
+                    rows[r].firstElementChild.innerText = 'Title';
+                }
+                else if (rowLabel.match('Section')) {
+                    const sectionVal = rows[r].children[1];
+                    const section = parseInt(sectionVal.innerText.trim());
+
+                    if (courseNumber in seatsAvailabilityData) {
+                        if (section in seatsAvailabilityData[courseNumber]) {
+                            sectionVal.innerHTML += "  (" + seatsAvailabilityData[courseNumber][section] + " Seats Available)";
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
 function getSeatsAvailability() {
 
-    courseSeatsURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php'
+    courseSeatsURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php';
     const xmlRequestInfo = {
         method: 'GET',
         action: 'xhttp',
@@ -41,11 +69,27 @@ function getSeatsAvailability() {
         try {
             if (data.responseXML == 'error') {
                 debugLog(data);
-            } 
+            }
             else {
             	const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
                 debugLog(htmlDoc);
+
+                const rowElems = htmlDoc.getElementsByClassName('t');
+                for (let r = 0; r < rowElems.length; r+=4) {
+                    const courses = rowElems[r].innerText.split('\n');
+                    const seats = rowElems[r+1].innerText;
+                    for (let c = 1; c < courses.length; c++) {
+                        const courseIdentifier = courses[c].trim().split(/\s{4}/);
+                        const courseName = courseIdentifier[0];
+                        const courseSection = courseIdentifier[1];
+                        if (!(courseName in seatsAvailabilityData)) {
+                            seatsAvailabilityData[courseName] = {};
+                        }
+                        seatsAvailabilityData[courseName][parseInt(courseSection)] = seats;
+                    }
+                }
+                debugLog(seatsAvailabilityData);
             }
         } 
         catch(err) {
