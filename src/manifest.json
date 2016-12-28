@@ -2,15 +2,14 @@
   "name": "RateMyDawson",
   "author": "kozdev",
   "manifest_version": 2,
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "Integrate teacher ratings and course seat availability into the Dawson Timetable and Registration Guide",
   "permissions" : [
     "declarativeContent",
     "*://timetable.dawsoncollege.qc.ca/*",
     "*://myintranet.dawsoncollege.qc.ca/*",
     "*://dawsoncollege.omnivox.ca/*", 
-    "*://ca.ratemyteachers.com/*", 
-    "*://www.ratemyprofessors.com/*"
+    "*://ca.ratemyteachers.com/*"
   ],
   "background": {
     "scripts": [ "js/backgroundHTTP.js" ],
@@ -34,8 +33,7 @@
         "*://timetable.dawsoncollege.qc.ca/*",
         "*://myintranet.dawsoncollege.qc.ca/*",
         "*://dawsoncollege.omnivox.ca/*", 
-        "*://ca.ratemyteachers.com/*", 
-        "*://www.ratemyprofessors.com/*"
+        "*://ca.ratemyteachers.com/*"
       ],
       "js" : [
         "lib/jquery-1.11.2.min.js", 
