@@ -1,9 +1,28 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+body {
+  margin:0px;
+}
+a {
+    text-decoration: none;
+}
+.btn {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.42857143;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .rmd-menu {
     background:#E9F3FC; 
     border-width:2px; 
     border-style:outset; 
     border-color:#337AB7; 
-    width:240px; 
+    width:220px; 
     padding:10px 12px;
 }
 .rmd-title {

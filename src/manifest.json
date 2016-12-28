@@ -2,7 +2,7 @@
   "name": "Rate My Dawson",
   "author": "kozdev",
   "manifest_version": 2,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Integrate teacher ratings and course seat availability into the Dawson Timetable and Registration Guide",
   "permissions" : [
     "declarativeContent",
@@ -21,7 +21,7 @@
       "38": "icons/RMD-128.png",
       "128": "icons/RMD-128.png"
     },
-    "default_popup": "popup/quicklinksMenu.html",
+    "default_popup": "menu/quicklinksMenu.html",
     "default_title": "Click to view Quick Links Menu!"
   },
   "icons": {
