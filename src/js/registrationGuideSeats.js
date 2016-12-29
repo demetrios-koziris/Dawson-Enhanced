@@ -18,6 +18,7 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 function setupSeatsAvailability() {
 	debugLog('Running: setupSeatsAvailability');
 	seatsAvailabilityData = {};
+    seatsAvailabilityURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php'
     getSeatsAvailability();
 }
 
@@ -30,7 +31,6 @@ function integrateSeatsAvailability() {
     coursesNumbers = document.getElementsByClassName('cnumber');
 
     if (coursesWraps.length > 0) {
-        
         for (let i= 0; i < coursesWraps.length; i++) {
             const courseNumber = coursesNumbers[i].innerText;
             const rows = coursesWraps[i].getElementsByTagName('li');
@@ -47,7 +47,7 @@ function integrateSeatsAvailability() {
                     if (courseNumber in seatsAvailabilityData) {
                         if (section in seatsAvailabilityData[courseNumber]) {
 
-                            sectionVal.innerHTML += '  <a href="https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php" target="_blank" rel="noopener noreferrer">(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)</a>';
+                            sectionVal.innerHTML += '  <a href="' + seatsAvailabilityURL + '" target="_blank" rel="noopener noreferrer">(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)</a>';
                         }
                     }
                 }
@@ -59,11 +59,10 @@ function integrateSeatsAvailability() {
 
 function getSeatsAvailability() {
 
-    courseSeatsURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php';
     const xmlRequestInfo = {
         method: 'GET',
         action: 'xhttp',
-        url: courseSeatsURL,
+        url: seatsAvailabilityURL,
     };
 
     chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
@@ -90,11 +89,38 @@ function getSeatsAvailability() {
                         seatsAvailabilityData[courseName][parseInt(courseSection)] = seats;
                     }
                 }
-                debugLog(seatsAvailabilityData);
+
+                if (Object.keys(seatsAvailabilityData).length === 0) {
+
+                    if (confirm("The Dawson Enhanced extension needs to access the Course Seats Available page before it can display available seats in the registration timetable")) {
+                        window.name = 'dawsonEnhancedFetchCourseSeats_1';
+                        window.open('https://dawsoncollege.omnivox.ca/intr/', '_self');
+                    }
+                }
             }
         } 
         catch(err) {
             debugLog('Error:\n' + err.stack);
         }
     });
+}
+
+function clickLink(link) {
+    var cancelled = false;
+
+    if (document.createEvent) {
+        var event = document.createEvent("MouseEvents");
+        event.initMouseEvent("click", true, true, window,
+            0, 0, 0, 0, 0,
+            false, false, false, false,
+            0, null);
+        cancelled = !link.dispatchEvent(event);
+    }
+    else if (link.fireEvent) {
+        cancelled = !link.fireEvent("onclick");
+    }
+
+    if (!cancelled) {
+        window.location = link.href;
+    }
 }
