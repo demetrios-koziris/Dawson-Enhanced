@@ -22,7 +22,7 @@ debugLog('DawsonEnhanced Debug mode is ON');
 
 debugLog('Running DawsonEnhanced');
 
-if (url.match(/.+timetable\.dawsoncollege.+/)) {
+if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user_login'))) {
 
 	setupTeacherRatings();
 	setupSeatsAvailability();
