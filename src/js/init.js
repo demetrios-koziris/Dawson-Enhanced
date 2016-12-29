@@ -1,5 +1,5 @@
 /*
-RateMyDawson is a chrome extension that integrates teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
+Dawson Enhanced is a chrome extension that integrates teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
 Copyright (C) 2016 Demetrios Koziris
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
@@ -18,9 +18,9 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 const url = window.location.href;
 
 window.debugMode = false;
-debugLog('RateMyDawson Debug mode is ON');
+debugLog('DawsonEnhanced Debug mode is ON');
 
-debugLog('Running RateMyDawson');
+debugLog('Running DawsonEnhanced');
 
 if (url.match(/.+timetable\.dawsoncollege.+/)) {
 

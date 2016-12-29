@@ -50,7 +50,7 @@ for browser in "$@"; do
 	fi 
 
 	today=`date '+%Y_%m_%d__%H_%M_%S'`;
-	buildname="RateMyDawson__"$today"__"$browser
+	buildname="DawsonEnhanced__"$today"__"$browser
 	echo "$0: Creating $browser version in build/$buildname"
 	mkdir -p build
 

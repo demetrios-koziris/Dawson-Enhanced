@@ -1,5 +1,5 @@
 /*
-RateMyDawson is a chrome extension that integrates teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
+Dawson Enhanced is a chrome extension that integrates teacher ratings and course seat availability into the Dawson Timetable and Registration Guide
 Copyright (C) 2016 Demetrios Koziris
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
@@ -20,6 +20,7 @@ function setupTeacherRatings() {
 	teacherRatings = {};
 	teacherData = {};
     failedMessage = 'Ratings data failed to load. Please click Search to reload.';
+    ratingsURL = 'http://ca.ratemyteachers.com';
 }
 
 
@@ -115,7 +116,7 @@ function setLoadingGif(teacherKey) {
 function getTeacherURL(teacherNameObj, fullNameSearch) {
 
     let ratingsContent = '';
-    let teacherSearchURL = 'http://ca.ratemyteachers.com/dawson-college/38432-s?q=';
+    let teacherSearchURL = ratingsURL + '/dawson-college/38432-s?q=';
     if (fullNameSearch) {
     	teacherSearchURL += teacherNameObj.firstName + '+';
     }
@@ -155,7 +156,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 } 
                 else if (searchResults.length == 1) { 
                     // 1 teacher result so create url with result
-                    teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
+                    teacherURL = ratingsURL + searchResults[0].children[0].getAttribute('href');
                     debugLog(teacherNameObj.fullName + ': ' + teacherURL);
                     getTeacherContent(teacherNameObj, teacherURL, 1);
                 } 
@@ -170,7 +171,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                                              teacherNameObj.firstName.toLowerCase().match(resultFirstName.toLowerCase()));
                         if (nameMatches){
                         	teacherFound = true;
-                            teacherURL = 'http://ca.ratemyteachers.com' + searchResults[0].children[0].getAttribute('href');
+                            teacherURL = ratingsURL + searchResults[0].children[0].getAttribute('href');
                         }
                         break;
                     }
@@ -245,7 +246,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 else if (resultCode == 1) {
                     
                     if (htmlDoc.getElementsByClassName('rating-summary').length < 2) {
-                        //See Vincenzo Lentini: http://ca.ratemyteachers.com/vince-lentini/6135115-t
+                        //See Vincenzo Lentini: vince-lentini/6135115-t
                         ratingsContent = 'Teacher ' + teacherNameObj.fullName + ' has no ratings. Please click to be the first to rate.';
                         updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 0);
                         updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
