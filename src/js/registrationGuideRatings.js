@@ -279,7 +279,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         ratingsContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
                         ratingsContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
                         ratingsContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
-                        ratingsContent += '</a></div><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
+                        ratingsContent += '</a><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
                         ratingsContent += '<tbody><tr>';
                         ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
                         for (let i = 0; i < ratingDataKeys.length; i++) {
@@ -290,7 +290,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         for (let i = 0; i < ratingLabels.length; i++) {
                             ratingsContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
                         }
-                        ratingsContent += '</tr></tbody></table>';
+                        ratingsContent += '</tr></tbody></table></div>';
 
                         updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 1);
                         updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsContent);
@@ -316,6 +316,7 @@ function updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsCont
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].className += ' schedule';
+            teacherElements[p].style = '';
             teacherElements[p].innerHTML = ratingsContent;
         }
     }
@@ -325,13 +326,9 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
-            const messageLink = document.createElement('a');
-            messageLink.href = teacherURL;
-            messageLink.target = '_blank';
-            messageLink.rel = 'noopener noreferrer';
-            messageLink.innerHTML = message;
+            teacherElements[p].style = '';
             removeChildren(teacherElements[p]);
-            teacherElements[p].appendChild(messageLink);
+            teacherElements[p].appendChild(generateNewTabLink(teacherURL, message));
         }
     }
 }
@@ -388,4 +385,13 @@ function removeChildren(parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
     }
+}
+
+function generateNewTabLink(url, content) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.innerHTML = content;
+    return link;
 }
