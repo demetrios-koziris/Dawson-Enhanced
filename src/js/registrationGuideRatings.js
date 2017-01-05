@@ -276,24 +276,8 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                         rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use');
                         rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty');
 
-                        ratingsContent = '<div class="ratings-summary" style="line-height: 1.6;"><a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
-                        ratingsContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
-                        ratingsContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
-                        ratingsContent += '</a><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
-                        ratingsContent += '<tbody><tr>';
-                        ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
-                        for (let i = 0; i < ratingDataKeys.length; i++) {
-                            ratingsContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
-                        }
-                        ratingsContent += '</tr></tbody><tbody><tr>';
-                        ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
-                        for (let i = 0; i < ratingLabels.length; i++) {
-                            ratingsContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
-                        }
-                        ratingsContent += '</tr></tbody></table></div>';
-
-                        updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 1);
-                        updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsContent);
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, rating, 1);
+                        updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating);
                     }
                 }                
             }
@@ -311,13 +295,14 @@ function parseRatingData(htmlDoc, className) {
     return (ratingElem ? ratingElem.innerText.trim() : '_');
 }
 
-function updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsContent) {
+function updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].className += ' schedule';
             teacherElements[p].style = '';
-            teacherElements[p].innerHTML = ratingsContent;
+            removeChildren(teacherElements[p]);
+            teacherElements[p].appendChild(generateRatingsContentElem(teacherURL, rating));
         }
     }
 }
@@ -394,4 +379,29 @@ function generateNewTabLink(url, content) {
     link.rel = 'noopener noreferrer';
     link.innerHTML = content;
     return link;
+}
+
+function generateRatingsContentElem(teacherURL, rating) {
+    ratingsContent = '<a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
+    ratingsContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
+    ratingsContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
+    ratingsContent += '</a><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
+    ratingsContent += '<tbody><tr>';
+    ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
+    for (let i = 0; i < ratingDataKeys.length; i++) {
+        ratingsContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
+    }
+    ratingsContent += '</tr></tbody><tbody><tr>';
+    ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
+    for (let i = 0; i < ratingLabels.length; i++) {
+        ratingsContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
+    }
+    ratingsContent += '</tr></tbody></table>';
+
+    const ratingsDiv = document.createElement('div');
+    ratingsDiv.class = 'ratings-summary';
+    ratingsDiv.style = 'line-height: 1.6';
+    ratingsDiv.innerHTML = ratingsContent;
+
+    return ratingsDiv;
 }
