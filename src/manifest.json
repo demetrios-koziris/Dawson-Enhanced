@@ -43,9 +43,6 @@
         "js/init.js"
       ]
     }
-  ],
-  "web_accessible_resources": [
-    "js/insertedRatingsFetcher.js"
   ]
 }
 

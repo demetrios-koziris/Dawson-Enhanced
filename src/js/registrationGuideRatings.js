@@ -21,7 +21,6 @@ function setupTeacherRatings() {
     teacherData = {};
     failedMessage = 'Ratings data failed to load. Please click Search to reload.';
     ratingsURL = 'http://ca.ratemyteachers.com';
-
     insertRatingsFetcher();
 }
 
@@ -29,9 +28,6 @@ function insertRatingsFetcher() {
     //inject script.js into page
     var s = document.createElement('script');
     s.src = chrome.extension.getURL('js/insertedRatingsFetcher.js');
-    // s.onload = function() {
-    //     this.parentNode.removeChild(this);
-    // };
     (document.head || document.documentElement).appendChild(s);
     console.log('inserted');
 }
@@ -72,10 +68,7 @@ function integrateTeacherRatingsButtons() {
 
                         if (!teacherKey.match(/\d+/g)) {
 
-                            ratingsRow = createRatingsRow();
-                            // ratingsRow = document.createElement('li');
-                            // ratingsRow.setAttribute('class', 'row');
-                            // ratingsRow.innerHTML = '<label class="col-md-2">Ratings</label><div class="col-md-10 schedule"><div>';
+                            ratingsRow = createRatingsRow(teacherKey);
                             
                             courses[i].insertBefore(ratingsRow, rows[r+1]);
                             ratingsElement = ratingsRow.children[1];
@@ -101,11 +94,13 @@ function integrateTeacherRatingsButtons() {
             }
         }
 
-        // loadRatings();
+        document.addEventListener("register", function(data) {
+            console.log(data.target.activeElement.value);
+        });
     }
 }
 
-function createRatingsRow() {
+function createRatingsRow(teacherKey) {
 
     const ratingsRow = document.createElement('li');
     ratingsRow.className = 'row';
@@ -121,9 +116,17 @@ function createRatingsRow() {
 
     const ratingsButton = document.createElement('button');
     ratingsButton.setAttribute('type', 'button');
-    ratingsButton.setAttribute('onclick', 'javascript:getRatings();');
+    ratingsButton.setAttribute("onclick", register.toString() +  " register();");
+    ratingsButton.className = 'btn btn-sm btn-default';
     ratingsButton.innerText = 'Get Ratings';
+    ratingsButton.value = teacherKey;
     ratingsDiv.append(ratingsButton);
 
     return ratingsRow;
+}
+
+function register() {
+    var event = document.createEvent('Event');
+    event = new Event('register');
+    document.dispatchEvent(event);
 }
