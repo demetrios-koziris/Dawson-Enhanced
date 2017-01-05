@@ -19,7 +19,7 @@ function setupTeacherRatings() {
     debugLog('Running: setupTeacherRatings');
     teacherRatings = {};
     teacherData = {};
-    insertFetchRatingsEventListener()
+    insertFetchRatingsEventListener();
     failedMessage = 'Ratings data failed to load. Please click Search to reload.';
     ratingsURL = 'http://ca.ratemyteachers.com';
 }
@@ -112,7 +112,15 @@ function integrateTeacherRatingsButtons() {
 function setLoadingGif(teacherKey) {
     teacherDivs = teacherData[teacherKey].elements;
     for (let i = 0; i < teacherDivs.length; i++) {
-        teacherDivs[i].innerHTML = '<div id="loadingDiv" style="padding-top: 6px;"><img style="display:inline;" src="https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif"></div>';
+        currTeacherDiv = teacherDivs[i];
+        while (currTeacherDiv.firstChild) {
+            currTeacherDiv.removeChild(currTeacherDiv.firstChild);
+        }
+
+        const loadingImg = document.createElement('img');
+        loadingImg.src = 'https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif';
+        loadingImg.style.display = 'inline';
+        currTeacherDiv.appendChild(loadingImg);
     }
 }
 
@@ -354,6 +362,7 @@ function createRatingsRow(teacherKey) {
 
     const ratingsDiv = document.createElement('div');
     ratingsDiv.className = 'col-md-10';
+    ratingsDiv.style.paddingTop = '6px';
     ratingsRow.append(ratingsDiv);
 
     const ratingsButton = document.createElement('button');
