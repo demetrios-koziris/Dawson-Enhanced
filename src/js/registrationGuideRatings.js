@@ -113,9 +113,7 @@ function setLoadingGif(teacherKey) {
     teacherDivs = teacherData[teacherKey].elements;
     for (let i = 0; i < teacherDivs.length; i++) {
         currTeacherDiv = teacherDivs[i];
-        while (currTeacherDiv.firstChild) {
-            currTeacherDiv.removeChild(currTeacherDiv.firstChild);
-        }
+        removeChildren(currTeacherDiv);
 
         const loadingImg = document.createElement('img');
         loadingImg.src = 'https://timetable.dawsoncollege.qc.ca/wp-content/plugins/timetable//assets/images/ajax-loader.gif';
@@ -317,7 +315,7 @@ function updateTeacherElementsWithRating(teacherNameObj, teacherURL, ratingsCont
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
-            teacherElements[p].setAttribute('class', 'col-md-10 schedule');
+            teacherElements[p].className += ' schedule';
             teacherElements[p].innerHTML = ratingsContent;
         }
     }
@@ -327,9 +325,13 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
     if (teacherData[teacherNameObj.fullNameKey]) {
         const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
-            teacherElements[p].setAttribute('class', 'col-md-10');
-            linkHTML = '<a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">' + message + '</a>';   
-            teacherElements[p].innerHTML = linkHTML;
+            const messageLink = document.createElement('a');
+            messageLink.href = teacherURL;
+            messageLink.target = '_blank';
+            messageLink.rel = 'noopener noreferrer';
+            messageLink.innerHTML = message;
+            removeChildren(teacherElements[p]);
+            teacherElements[p].appendChild(messageLink);
         }
     }
 }
@@ -380,4 +382,10 @@ function fetchRatings() {
     var event = document.createEvent('Event');
     event = new Event('fetchRatings');
     document.dispatchEvent(event);
+}
+
+function removeChildren(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
 }

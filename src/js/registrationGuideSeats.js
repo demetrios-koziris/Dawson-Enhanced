@@ -52,7 +52,7 @@ function integrateSeatsAvailability() {
                             seatsLink.target = '_blank';
                             seatsLink.rel = 'noopener noreferrer';
                             seatsLink.innerText = '(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)';
-                            sectionVal.innerHTML += ' '
+                            sectionVal.innerHTML += ' ';
                             sectionVal.appendChild(seatsLink);
                         }
                     }
