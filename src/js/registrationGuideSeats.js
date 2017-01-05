@@ -18,7 +18,7 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 function setupSeatsAvailability() {
 	debugLog('Running: setupSeatsAvailability');
 	seatsAvailabilityData = {};
-    seatsAvailabilityURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php'
+    seatsAvailabilityURL = 'https://myintranet.dawsoncollege.qc.ca/registration/course.seats.php';
     getSeatsAvailability();
 }
 
@@ -74,6 +74,7 @@ function getSeatsAvailability() {
             	const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
                 debugLog(htmlDoc);
+                console.log(htmlDoc);
 
                 const rowElems = htmlDoc.getElementsByClassName('t');
                 for (let r = 0; r < rowElems.length; r+=4) {
