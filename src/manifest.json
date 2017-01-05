@@ -2,7 +2,7 @@
   "name": "Dawson Enhanced",
   "author": "kozirisdev",
   "manifest_version": 2,
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "Integrate teacher ratings and course seat availability into the Dawson Timetable and Registration Guide",
   "permissions" : [
     "declarativeContent",
@@ -43,6 +43,9 @@
         "js/init.js"
       ]
     }
+  ],
+  "web_accessible_resources": [
+    "js/insertedRatingsFetcher.js"
   ]
 }
 
