@@ -17,7 +17,7 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 
 const url = window.location.href;
 
-window.debugMode = true;
+window.debugMode = false;
 debugLog('DawsonEnhanced Debug mode is ON');
 
 debugLog('Running DawsonEnhanced');

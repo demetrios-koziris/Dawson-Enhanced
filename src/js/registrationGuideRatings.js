@@ -372,36 +372,62 @@ function removeChildren(parent) {
     }
 }
 
-function generateNewTabLink(url, content) {
+function generateNewTabLink(url, message) {
     const link = document.createElement('a');
     link.href = url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.innerHTML = content;
+    link.innerHTML = message;
     return link;
 }
 
 function generateRatingsContentElem(teacherURL, rating) {
-    ratingsContent = '<a href="' + teacherURL + '" target="_blank" rel="noopener noreferrer">';
-    ratingsContent += rating.fullName + ': <b>' + rating.overall + '</b> average based on ';
-    ratingsContent += rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
-    ratingsContent += '</a><table class="ratings-table" style="table-layout: fixed; line-height: 1;">';
-    ratingsContent += '<tbody><tr>';
-    ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
-    for (let i = 0; i < ratingDataKeys.length; i++) {
-        ratingsContent += '<td style="text-align: center; border: solid #d9d9d9; border-width: 0px 1px;">' + rating[ratingDataKeys[i]] + '</td>';
-    }
-    ratingsContent += '</tr></tbody><tbody><tr>';
-    ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
-    for (let i = 0; i < ratingLabels.length; i++) {
-        ratingsContent += '<td style="text-align: center; padding: 0px; font-size: 12px;">' + ratingLabels[i] + '</td>';
-    }
-    ratingsContent += '</tr></tbody></table>';
 
     const ratingsDiv = document.createElement('div');
     ratingsDiv.class = 'ratings-summary';
     ratingsDiv.style = 'line-height: 1.6';
-    ratingsDiv.innerHTML = ratingsContent;
+
+    ratingsLinkMessage = rating.fullName + ': <b>' + rating.overall + '</b> average based on ' + rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
+    const ratingsLink = generateNewTabLink(teacherURL, ratingsLinkMessage);
+    ratingsDiv.appendChild(ratingsLink);
+
+    const ratingsTable = document.createElement('table');
+    ratingsTable.class = 'ratings-table';
+    ratingsTable.style.tableLayout = 'fixed';
+    ratingsTable.style.lineHeight = '1';
+    ratingsDiv.appendChild(ratingsTable);
+
+    const ratingsDataTbody = document.createElement('tbody');
+    ratingsTable.appendChild(ratingsDataTbody);
+
+    const ratingsDataRow = document.createElement('tr');
+    ratingsDataTbody.appendChild(ratingsDataRow);
+
+    ratingDataKeys = ['easiness', 'helpfulness', 'clarity', 'knowledge', 'textbookUse', 'examDifficulty'];
+    for (let i = 0; i < ratingDataKeys.length; i++) {
+        const ratingsDataTd = document.createElement('td');
+        ratingsDataTd.style.textAlign = 'center';
+        ratingsDataTd.style.border = 'solid #d9d9d9';
+        ratingsDataTd.style.borderWidth = '0px 1px';
+        ratingsDataTd.innerText = rating[ratingDataKeys[i]];
+        ratingsDataRow.appendChild(ratingsDataTd);
+    }
+
+    const ratingsLabelTbody = document.createElement('tbody');
+    ratingsTable.appendChild(ratingsLabelTbody);
+
+    const ratingsLabelRow = document.createElement('tr');
+    ratingsLabelTbody.appendChild(ratingsLabelRow);
+
+    ratingLabels = ['Easiness', 'Helpfulness', 'Clarity', 'Knowledge', 'Textbook Use', 'Exam Difficulty'];
+    for (let i = 0; i < ratingLabels.length; i++) {
+        const ratingsLabelTd = document.createElement('td');
+        ratingsLabelTd.style.textAlign = 'center';
+        ratingsLabelTd.style.padding = '0px';
+        ratingsLabelTd.style.fontSize = '12px';
+        ratingsLabelTd.innerText = ratingLabels[i];
+        ratingsLabelRow.appendChild(ratingsLabelTd);
+    }
 
     return ratingsDiv;
 }
