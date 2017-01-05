@@ -47,7 +47,13 @@ function integrateSeatsAvailability() {
                     if (courseNumber in seatsAvailabilityData) {
                         if (section in seatsAvailabilityData[courseNumber]) {
 
-                            sectionVal.innerHTML += '  <a href="' + seatsAvailabilityURL + '" target="_blank" rel="noopener noreferrer">(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)</a>';
+                            const seatsLink = document.createElement('a');
+                            seatsLink.href = seatsAvailabilityURL;
+                            seatsLink.target = '_blank';
+                            seatsLink.rel = 'noopener noreferrer';
+                            seatsLink.innerText = '(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)';
+                            sectionVal.innerHTML += ' '
+                            sectionVal.appendChild(seatsLink);
                         }
                     }
                 }
