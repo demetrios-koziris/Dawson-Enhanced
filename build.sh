@@ -57,7 +57,7 @@ for browser in "$@"; do
 	# build firefox add-on
 	if [ $browser == firefox ]; then
 
-		match='"author": "kozdev",'
+		match='"author": "kozirisdev",'
 		insert='  "applications":{"gecko":{"id":"extension@example.org"}},'
 		file='src/manifest.json'
 		sed -i "s/$match/$match\n$insert/" $file
