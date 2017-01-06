@@ -18,7 +18,7 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 function setupTeacherRatings() {
     debugLog('Running: setupTeacherRatings');
     teacherRatings = {};
-    teacherData = {};
+    teacherSearchElements = {};
     insertFetchRatingsEventListener();
     failedMessage = 'Ratings data failed to load. Please click Search to reload.';
     ratingsURL = 'http://ca.ratemyteachers.com';
@@ -42,7 +42,7 @@ function insertFetchRatingsEventListener() {
         }
         else {
             teacherRatings[teacherKey] = {code: -1, nameObj: null, URL: null, content: null };
-            getTeacherURL(teacherData[teacherKey].nameObj, true);
+            getTeacherURL(teacherSearchElements[teacherKey].nameObj, true);
         }
     });
 }
@@ -62,7 +62,7 @@ function generateTeacherNameObject(origName) {
 function integrateTeacherRatingsButtons() {
     debugLog('Running: integrateTeacherRatings');
     debugLog(teacherRatings);
-    teacherData = {};
+    teacherSearchElements = {};
 
     courses = document.getElementsByClassName('section-details');
     if (courses.length > 0) {
@@ -87,11 +87,11 @@ function integrateTeacherRatingsButtons() {
                             courses[i].insertBefore(ratingsRow, rows[r+1]);
                             ratingsElement = ratingsRow.children[1];
 
-                            if (teacherData[teacherKey]) {
-                                teacherData[teacherKey].elements.push(ratingsElement);
+                            if (teacherSearchElements[teacherKey]) {
+                                teacherSearchElements[teacherKey].elements.push(ratingsElement);
                             }
                             else {
-                                teacherData[teacherKey] = {
+                                teacherSearchElements[teacherKey] = {
                                     nameObj: teacherNameObj, 
                                     elements: [ratingsElement] 
                                 };
@@ -110,7 +110,7 @@ function integrateTeacherRatingsButtons() {
 }
 
 function setLoadingGif(teacherKey) {
-    teacherDivs = teacherData[teacherKey].elements;
+    teacherDivs = teacherSearchElements[teacherKey].elements;
     for (let i = 0; i < teacherDivs.length; i++) {
         currTeacherDiv = teacherDivs[i];
         removeChildren(currTeacherDiv);
@@ -296,8 +296,8 @@ function parseRatingData(htmlDoc, className) {
 }
 
 function updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating) {
-    if (teacherData[teacherNameObj.fullNameKey]) {
-        const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+    if (teacherSearchElements[teacherNameObj.fullNameKey]) {
+        const teacherElements = teacherSearchElements[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].className += ' schedule';
             teacherElements[p].style = '';
@@ -308,8 +308,8 @@ function updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating) {
 }
 
 function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
-    if (teacherData[teacherNameObj.fullNameKey]) {
-        const teacherElements = teacherData[teacherNameObj.fullNameKey].elements;
+    if (teacherSearchElements[teacherNameObj.fullNameKey]) {
+        const teacherElements = teacherSearchElements[teacherNameObj.fullNameKey].elements;
         for (let p = 0; p < teacherElements.length; p++) {
             teacherElements[p].style = '';
             removeChildren(teacherElements[p]);

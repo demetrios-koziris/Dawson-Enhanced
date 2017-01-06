@@ -80,7 +80,6 @@ function getSeatsAvailability() {
             	const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
                 debugLog(htmlDoc);
-                console.log(htmlDoc);
 
                 const rowElems = htmlDoc.getElementsByClassName('t');
                 for (let r = 0; r < rowElems.length; r+=4) {
