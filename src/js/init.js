@@ -25,8 +25,6 @@ debugLog('Running DawsonEnhanced');
 if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user_login'))) {
 
 	setupTeacherRatings();
-	setupSeatsAvailability();
-
 	mutationCount = 0;
 
 	// select the target node
@@ -39,8 +37,6 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
 
 	  		if (mutationCount % 2 === 0) {
                 debugLog('mutation count: ' + mutationCount);
-
-                integrateSeatsAvailability();
 	  			integrateTeacherRatingsButtons();
 	  			
 	  		}
@@ -53,25 +49,6 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
 
 	// pass in the target node, as well as the observer options
 	observer.observe(target, config);
-}
-
-if (url.match(/.+dawsoncollege\.omnivox\.ca\/intr\//)) {
-
-	if (window.name === 'dawsonEnhancedFetchCourseSeats_1') {
-	    courseAvailabilityLink = document.getElementsByClassName('lienMenuOmnivox')[30];
-	    caURL = 'https://dawsoncollege.omnivox.ca' + courseAvailabilityLink.href.match(/javascript\:OpenCentre\(\'([^\']+)/)[1];
-
-	    window.name = 'dawsonEnhancedFetchCourseSeats_2';
-	    window.open(caURL, "_self");
-	}
-}
-
-if (url.match(/.+myintranet\.dawsoncollege\.qc\.ca\/registration\/course\.seats\.php/)) {
-
-	if (window.name === 'dawsonEnhancedFetchCourseSeats_2') {
-	    window.name = 'dawsonEnhancedFetchCourseSeats_0';
-	    window.open('https://timetable.dawsoncollege.qc.ca/', "_self");
-	}
 }
 
 function debugLog(message) {

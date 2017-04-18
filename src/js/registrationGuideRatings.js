@@ -354,7 +354,7 @@ function createRatingsRow(teacherKey) {
     ratingsButton.setAttribute("onclick", fetchRatings.toString() +  " fetchRatings();");
     ratingsButton.className = 'btn btn-sm btn-default';
     ratingsButton.innerText = 'Get Ratings';
-    ratingsButton.title = 'Click to load ratings for this teacher.'
+    ratingsButton.title = 'Click to load ratings for this teacher.';
     ratingsButton.value = teacherKey;
     ratingsDiv.append(ratingsButton);
 
