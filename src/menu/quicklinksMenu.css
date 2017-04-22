@@ -49,3 +49,9 @@ a {
     border: 1px solid #000;
     background: -webkit-linear-gradient(left, #1E9CD9, #FFFFFF);
 }
+
+#version {
+  text-align: center;
+  margin-top: 4px;
+  color: black;
+}
