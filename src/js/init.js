@@ -17,10 +17,9 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 
 const url = window.location.href;
 
-window.debugMode = false;
-debugLog('DawsonEnhanced Debug mode is ON');
-
-debugLog('Running DawsonEnhanced');
+let devMode = !('update_url' in chrome.runtime.getManifest());
+let devLog = ( devMode ? console.log.bind(window.console) : function(){} );
+devLog("DawsonEnhanced log mode is ON");
 
 if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user_login'))) {
 
@@ -36,7 +35,7 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
             mutationCount++;
 
 	  		if (mutationCount % 2 === 0) {
-                debugLog('mutation count: ' + mutationCount);
+                devLog('mutation count: ' + mutationCount);
 	  			integrateTeacherRatingsButtons();
 	  			
 	  		}
@@ -49,10 +48,4 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
 
 	// pass in the target node, as well as the observer options
 	observer.observe(target, config);
-}
-
-function debugLog(message) {
-    if (debugMode) {
-        console.log(message);
-    }
 }

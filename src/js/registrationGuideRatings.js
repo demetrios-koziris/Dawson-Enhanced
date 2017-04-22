@@ -16,7 +16,7 @@ The GNU General Public License can also be found at <http://www.gnu.org/licenses
 
 
 function setupTeacherRatings() {
-    debugLog('Running: setupTeacherRatings');
+    devLog('Running: setupTeacherRatings');
     teacherRatings = {};
     teacherSearchElements = {};
     insertFetchRatingsEventListener();
@@ -33,7 +33,7 @@ function insertFetchRatingsEventListener() {
         if (teacherRatings[teacherKey]) {
             savedRatings = teacherRatings[teacherKey];
             if (savedRatings.code === 1) {
-                debugLog(teacherKey);
+                devLog(teacherKey);
                 updateTeacherElementsWithRating(savedRatings.nameObj, savedRatings.URL, savedRatings.content);
             }
             else if (savedRatings.code > -1) {
@@ -60,8 +60,8 @@ function generateTeacherNameObject(origName) {
 }
 
 function integrateTeacherRatingsButtons() {
-    debugLog('Running: integrateTeacherRatings');
-    debugLog(teacherRatings);
+    devLog('Running: integrateTeacherRatings');
+    devLog(teacherRatings);
     teacherSearchElements = {};
 
     courses = document.getElementsByClassName('section-details');
@@ -140,7 +140,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
     chrome.runtime.sendMessage(xmlRequestInfo, function(data) {
         try {
             if (data.responseXML == 'error') {
-                debugLog(data);
+                devLog(data);
                 updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
                 updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, failedMessage);
             } 
@@ -154,19 +154,19 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 if (searchResults.length === 0) { 
                     if (fullNameSearch) {
                         // 0 teacher result from fullNameSearch search so try search with just last name
-                        // debugLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                        // devLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
                         getTeacherURL(teacherNameObj, false);
                     }
                     else {
                         // 0 teacher result from search using just last name
-                        debugLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
+                        devLog(teacherNameObj.fullName + ': (zero) ' + teacherURL);
                         getTeacherContent(teacherNameObj, teacherURL, 0);
                     }
                 } 
                 else if (searchResults.length == 1) { 
                     // 1 teacher result so create url with result
                     teacherURL = ratingsURL + searchResults[0].children[0].getAttribute('href');
-                    debugLog(teacherNameObj.fullName + ': ' + teacherURL);
+                    devLog(teacherNameObj.fullName + ': ' + teacherURL);
                     getTeacherContent(teacherNameObj, teacherURL, 1);
                 } 
                 else {
@@ -185,18 +185,18 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                         break;
                     }
                     if (teacherFound) {
-                        debugLog(teacherNameObj.fullName + ': ' + teacherURL);
+                        devLog(teacherNameObj.fullName + ': ' + teacherURL);
                         getTeacherContent(teacherNameObj, teacherURL, 1);
                     }
                     else {
-                        debugLog(teacherNameObj.fullName + ': (mult) ' + teacherURL);
+                        devLog(teacherNameObj.fullName + ': (mult) ' + teacherURL);
                         getTeacherContent(teacherNameObj, teacherURL, 2);
                     }                        
                 }
             }
         } 
         catch(err) {
-            debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
+            devLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
             updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, failedMessage);
         }
@@ -216,7 +216,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
         try {
 
             if (data.responseXML == 'error') {
-                debugLog(data);
+                devLog(data);
                 updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
                 updateTeacherElementsWithMessage(teacherNameObj, teacherURL, failedMessage);
             } 
@@ -283,7 +283,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
             }
         } 
         catch(err) {
-            debugLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
+            devLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
             updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherURL, failedMessage);
         }
@@ -320,7 +320,7 @@ function updateTeacherElementsWithMessage(teacherNameObj, teacherURL, message) {
 
 function updateSavedTeacherRatings(teacherNameObj, teacherURL, content, code) {
     if (code === -1) {
-        debugLog('DELETE ' + teacherNameObj.fullName);
+        devLog('DELETE ' + teacherNameObj.fullName);
         delete teacherRatings[teacherNameObj.fullNameKey];
     }
     else {
