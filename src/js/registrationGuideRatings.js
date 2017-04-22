@@ -102,7 +102,10 @@ function integrateTeacherRatingsButtons() {
                 else if (rowLabel.match('Drop Date')) {
                     // rename row label to Drop Date instead of Course Drop Date so it takes only 1 line
                     rows[r].firstElementChild.innerText = 'Drop Date';
-                    break;
+                }
+                else if (rowLabel.match('Seats')) {
+                    // rename row label to Availability instead of Seats Available so it takes only 1 line
+                    rows[r].firstElementChild.innerText = 'Availability';
                 }
             }
         }
