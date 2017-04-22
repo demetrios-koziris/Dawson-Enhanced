@@ -197,7 +197,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
         } 
         catch(err) {
             devLog('Error: ' + teacherNameObj.fullName + '\n' + err.stack);
-            updateSavedTeacherRatings(teacherNameObj, teacherURL, failedMessage, -1);
+            updateSavedTeacherRatings(teacherNameObj, teacherSearchURL, failedMessage, -1);
             updateTeacherElementsWithMessage(teacherNameObj, teacherSearchURL, failedMessage);
         }
     });
