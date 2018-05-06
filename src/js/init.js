@@ -24,7 +24,7 @@ devLog("DawsonEnhanced log mode is ON");
 if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user_login'))) {
 
 	setupTeacherRatings();
-	setupSeatsAvailability();
+	// setupSeatsAvailability();
 	mutationCount = 0;
 
 	// select the target node
@@ -39,7 +39,7 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
                 devLog('mutation count: ' + mutationCount);
                 
 	  			integrateTeacherRatingsButtons();
-	  			integrateSeatsAvailability();
+	  			// integrateSeatsAvailability();
 	  		}
 
 	  	});    
