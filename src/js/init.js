@@ -55,11 +55,22 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
 if (url.match(/.+dawsoncollege\.omnivox\.ca\/intr\//)) {
 
 	if (window.name === 'dawsonEnhancedFetchCourseSeats_1') {
-	    courseAvailabilityLink = document.getElementsByClassName('lienMenuOmnivox')[30];
-	    caURL = 'https://dawsoncollege.omnivox.ca' + courseAvailabilityLink.href.match(/javascript\:OpenCentre\(\'([^\']+)/)[1];
+	    omvivoxLinks = document.getElementsByClassName('lienMenuOmnivox');
+	    courseAvailabilityLink = null;
+	    for (let i = 0; i < omvivoxLinks.length; i++) {
+	    	if (omvivoxLinks[i].innerText === 'Course Seats Available') {
+	    		courseAvailabilityLink = omvivoxLinks[i];
+	    	}
+	    }
+	    if (courseAvailabilityLink) {
+		    caURL = 'https://dawsoncollege.omnivox.ca' + courseAvailabilityLink.href.match(/javascript\:OpenCentre\(\'([^\']+)/)[1];
 
-	    window.name = 'dawsonEnhancedFetchCourseSeats_2';
-	    window.open(caURL, "_self");
+		    window.name = 'dawsonEnhancedFetchCourseSeats_2';
+		    window.open(caURL, "_self");
+		}
+		else {
+			alert("Dawson Enhanced was not able to find the 'Course Seats Available' link. Please find and click this link to allow Dawson Enhanced to access the data before returning to the Timetable and Registration Guide.")
+		}
 	}
 }
 

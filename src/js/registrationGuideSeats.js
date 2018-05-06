@@ -98,7 +98,7 @@ function getSeatsAvailability() {
 
                 if (Object.keys(seatsAvailabilityData).length === 0) {
 
-                    if (confirm("The Dawson Enhanced extension needs to access the Course Seats Available page before it can display available seats in the registration timetable")) {
+                    if (confirm("The Dawson Enhanced extension needs to access the Course Seats Available page before it can display available seats in the registration timetable. Please click OK to allow Dawson Enhanced to do this or Cancel if you do not want to allow this.")) {
                         window.name = 'dawsonEnhancedFetchCourseSeats_1';
                         window.open('https://dawsoncollege.omnivox.ca/intr/', '_self');
                     }
