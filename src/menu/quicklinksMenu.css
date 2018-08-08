@@ -47,7 +47,7 @@ a {
 .rmd-button:hover {
     color: #000;
     border: 1px solid #000;
-    background: -webkit-linear-gradient(left, #1E9CD9, #FFFFFF);
+    background: #1E9CD9;
 }
 
 #version {
