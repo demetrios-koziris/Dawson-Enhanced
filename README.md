@@ -4,15 +4,15 @@ Browser Extension integrating teacher ratings and course seat availability into 
 <br>
 
 ## Building the extension using the `build.sh` script
-####Usage:  
+#### Usage:  
 ```
 command [option] [parameter]... 
 ```
-####Options:  
+#### Options:  
 ```
 -c       Clean the /build directory before building  
 ```
-####Parameters:  
+#### Parameters:  
 ```
 chrome   Create a chrome extension in /build  
 firefox  Create a firefox add-on in /build 
@@ -20,7 +20,7 @@ firefox  Create a firefox add-on in /build
 ```
 *If no parameters are passed, script will default to building the extension for every browser
 ```
-####Examples:
+#### Examples:
 ```
 ./build.sh
 ./build.sh -c
