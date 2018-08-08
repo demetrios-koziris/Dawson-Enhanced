@@ -39,7 +39,7 @@ if (url.match(/.+timetable\.dawsoncollege.+/) && !(document.getElementById('user
                 devLog('mutation count: ' + mutationCount);
                 
 	  			integrateTeacherRatingsButtons();
-	  			// integrateSeatsAvailability();
+	  			integrateSeatsAvailability();
 	  		}
 
 	  	});    

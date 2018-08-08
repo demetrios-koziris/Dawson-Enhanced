@@ -356,7 +356,7 @@ function createRatingsRow(teacherKey) {
     ratingsButton.setAttribute('type', 'button');
     ratingsButton.setAttribute("onclick", fetchRatings.toString() +  " fetchRatings();");
     ratingsButton.className = 'btn btn-sm btn-default';
-    ratingsButton.innerText = 'Get Ratings';
+    ratingsButton.innerText = 'Fetch Ratings with Dawson Enhanced';
     ratingsButton.title = 'Click to load ratings for this teacher.';
     ratingsButton.value = teacherKey;
     ratingsDiv.append(ratingsButton);

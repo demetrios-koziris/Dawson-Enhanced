@@ -27,8 +27,8 @@ function integrateSeatsAvailability() {
 	devLog(seatsAvailabilityData);
 
     
-    coursesWraps = document.getElementsByClassName('course-wrap');
-    coursesNumbers = document.getElementsByClassName('cnumber');
+    const coursesWraps = document.getElementsByClassName('course-wrap');
+    const coursesNumbers = document.getElementsByClassName('cnumber');
 
     if (coursesWraps.length > 0) {
         for (let i= 0; i < coursesWraps.length; i++) {
@@ -51,7 +51,7 @@ function integrateSeatsAvailability() {
                             seatsLink.href = seatsAvailabilityURL;
                             seatsLink.target = '_blank';
                             seatsLink.rel = 'noopener noreferrer';
-                            seatsLink.innerText = '(' + seatsAvailabilityData[courseNumber][section] + ' Seats Available)';
+                            seatsLink.innerHTML = '(Dawson Enhanced found <b>' + seatsAvailabilityData[courseNumber][section] + '</b> Seats Available)';
                             sectionVal.innerHTML += ' ';
                             sectionVal.appendChild(seatsLink);
                         }
@@ -81,18 +81,23 @@ function getSeatsAvailability() {
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
                 devLog(htmlDoc);
 
-                const rowElems = htmlDoc.getElementsByClassName('t');
-                for (let r = 0; r < rowElems.length; r+=4) {
-                    const courses = rowElems[r].innerText.split('\n');
-                    const seats = rowElems[r+1].innerText;
-                    for (let c = 1; c < courses.length; c++) {
-                        const courseIdentifier = courses[c].trim().split(/\s{4}/);
-                        const courseName = courseIdentifier[0];
-                        const courseSection = courseIdentifier[1];
-                        if (!(courseName in seatsAvailabilityData)) {
-                            seatsAvailabilityData[courseName] = {};
+                const contentWraps = htmlDoc.getElementById('content_wrap');
+                const rowElems = contentWraps.getElementsByTagName('tr');
+                for (let row of rowElems) {
+                    const cols = row.getElementsByClassName('t');
+                    if (cols.length == 5) {
+                        const courses = cols[0].innerText.split('\n');
+                        const seats = cols[1].innerText;
+                        for (let course of courses) {
+                            const courseIdentifier = course.trim().split(/\s{4}/);
+                            const courseCode = courseIdentifier[0];
+                            const courseSection = courseIdentifier[1];
+                            if (!(courseCode in seatsAvailabilityData)) {
+                                seatsAvailabilityData[courseCode] = {};
+                            }
+                            seatsAvailabilityData[courseCode][parseInt(courseSection)] = seats;
                         }
-                        seatsAvailabilityData[courseName][parseInt(courseSection)] = seats;
+                        
                     }
                 }
 
