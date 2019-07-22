@@ -75,6 +75,7 @@ function integrateTeacherRatingsButtons() {
                 if (rowLabel.match('Teacher')) {
 
                     teachers = rows[r].children[1].innerText.split(',');
+                    rowAfterTeachers = rows[r].nextSibling;
                     for (let t = 0; t < teachers.length; t++) {
                         teacherName = teachers[t].trim();
                         teacherNameObj = generateTeacherNameObject(teacherName);
@@ -82,9 +83,9 @@ function integrateTeacherRatingsButtons() {
 
                         if (!teacherKey.match(/\d+/g)) {
 
-                            ratingsRow = createRatingsRow(teacherKey);
+                            ratingsRow = createRatingsRow(teacherNameObj);
                             
-                            courses[i].insertBefore(ratingsRow, rows[r+1]);
+                            courses[i].insertBefore(ratingsRow, rowAfterTeachers);
                             ratingsElement = ratingsRow.children[1];
 
                             if (teacherSearchElements[teacherKey]) {
@@ -128,11 +129,12 @@ function setLoadingGif(teacherKey) {
 function getTeacherURL(teacherNameObj, fullNameSearch) {
 
     let ratingsContent = '';
-    let teacherSearchURL = ratingsURL + '/dawson-college/38432-s?q=';
+    let teacherSearchURL = ratingsURL + '/search?utf8=%E2%9C%93&country=ca&state=quebec&city=montreal&school=dawson-college&commit=Search&q=';
     if (fullNameSearch) {
         teacherSearchURL += teacherNameObj.firstName + '+';
     }
     teacherSearchURL += teacherNameObj.lastName;
+    devLog(teacherSearchURL);
 
     const xmlRequestInfo = {
         method: 'GET',
@@ -152,7 +154,8 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 let teacherURL = data.url;
                 const htmlParser = new DOMParser();
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
-                const searchResults = htmlDoc.getElementsByClassName('teacher_name');
+                const searchResults = htmlDoc.querySelectorAll('.card-title a');
+                devLog(searchResults);
 
                 if (searchResults.length === 0) { 
                     if (fullNameSearch) {
@@ -168,7 +171,7 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                 } 
                 else if (searchResults.length == 1) { 
                     // 1 teacher result so create url with result
-                    teacherURL = ratingsURL + searchResults[0].children[0].getAttribute('href');
+                    teacherURL = searchResults[0].href;
                     devLog(teacherNameObj.fullName + ': ' + teacherURL);
                     getTeacherContent(teacherNameObj, teacherURL, 1);
                 } 
@@ -176,14 +179,14 @@ function getTeacherURL(teacherNameObj, fullNameSearch) {
                     //multiple profs so search for exact or close match
                     let teacherFound = false;                    
                     for (let i = 0; i < searchResults.length; i++) {
-                        const resultName = searchResults[i].children[0].getAttribute('href').split('/')[1].replace(/\-/g, ' ');
-                        const resultFirstName = resultName.split(' ')[1].trim(' ');
+                        const resultName = searchResults[i].innerText;
+                        const resultFirstName = resultName.split(' ')[0].trim(' ');
                         const nameMatches = (getEditDistance(resultFirstName.toLowerCase(), teacherNameObj.firstName.toLowerCase())<=2 || 
                                              resultName.toLowerCase().match(teacherNameObj.firstName.toLowerCase()) || 
                                              teacherNameObj.firstName.toLowerCase().match(resultFirstName.toLowerCase()));
                         if (nameMatches){
                             teacherFound = true;
-                            teacherURL = ratingsURL + searchResults[0].children[0].getAttribute('href');
+                            teacherURL = searchResults[i].href;
                         }
                         break;
                     }
@@ -230,9 +233,7 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 const htmlDoc = htmlParser.parseFromString(data.responseXML, 'text/html');
 
                 const rating = {
-                    summary: 'ERROR',
                     fullName: 'ERROR',
-                    overall: 'ERROR',
                     easiness: 'ERROR',
                     helpfulness: 'ERROR',
                     clarity: 'ERROR',
@@ -243,45 +244,41 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
                 };
                 
                 if (resultCode === 0) {
-                    ratingsContent = 'Teacher ' + teacherNameObj.fullName + ' not found. Please click to search RMT.';
+                    ratingsContent = '❌ Teacher <b>' + teacherNameObj.fullName + '</b> not found. Please click to search.';
                     updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 0);
                     updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
 
                 } 
                 else if (resultCode == 2) {
-                    ratingsContent = 'Multiple teachers found for ' + teacherNameObj.fullName + '. Please click to see results.';
+                    ratingsContent = '👥 Multiple teachers found for <b>' + teacherNameObj.fullName + '</b>. Please click to see results.';
                     updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 2);
                     updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
 
                 } 
                 else if (resultCode == 1) {
                     
-                    if (htmlDoc.getElementsByClassName('rating-summary').length < 2) {
-                        //See Vincenzo Lentini: vince-lentini/6135115-t
-                        ratingsContent = 'Teacher ' + teacherNameObj.fullName + ' has no ratings. Please click to be the first to rate.';
-                        updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 0);
-                        updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
-                    } 
-                    else {
-                        
-                        ratingElem = htmlDoc.getElementsByClassName('rating-summary')[0];
-                        if (ratingElem) {
-                            ratingSummary = ratingElem.innerText.split('\n');
-                            rating.overall = ratingSummary[2];
-                            rating.numOfRatings = ratingSummary[4];
-                            // rating.summary = ratingElem.innerText.replace(/\n/g, ' ');
-                        }
-                        rating.fullName = parseRatingData(htmlDoc, 'teacher_name');
-                        rating.easiness = parseRatingData(htmlDoc, 'easy');
-                        rating.helpfulness = parseRatingData(htmlDoc, 'helpful');
-                        rating.clarity = parseRatingData(htmlDoc, 'clarity');
-                        rating.knowledge = parseRatingData(htmlDoc, 'knowledgeable');
-                        rating.textbookUse = parseRatingData(htmlDoc, 'textbook_use');
-                        rating.examDifficulty = parseRatingData(htmlDoc, 'exam_difficulty');
+                    if (htmlDoc.querySelector('.alert-primary')) {
+
+                        rating.fullName = htmlDoc.querySelector('.heading-wrap .mb-3').innerText;
+                        rating.easiness = parseMetricData(htmlDoc, 'metric-1');
+                        rating.helpfulness = parseMetricData(htmlDoc, 'metric-2');
+                        rating.clarity = parseMetricData(htmlDoc, 'metric-3');
+                        rating.knowledge = parseMetricData(htmlDoc, 'metric-4');
+                        rating.textbookUse = parseMetricData(htmlDoc, 'metric-5');
+                        rating.examDifficulty = parseMetricData(htmlDoc, 'metric-6');
+
+                        const ratingsCount = htmlDoc.querySelector('p').innerText.match(/Data based on (?<num>[0-9]+) /);
+                        rating.numOfRatings = (ratingsCount ? ratingsCount.groups.num : '_');
 
                         updateSavedTeacherRatings(teacherNameObj, teacherURL, rating, 1);
                         updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating);
                     }
+                    else {
+                        ratingsContent = '✨ Data found for <b>' + teacherNameObj.fullName + '</b> does not fall under simple categories. Please click to view.';
+                        updateSavedTeacherRatings(teacherNameObj, teacherURL, ratingsContent, 3);
+                        updateTeacherElementsWithMessage(teacherNameObj, teacherURL, ratingsContent);
+                    }
+
                 }                
             }
         } 
@@ -293,9 +290,16 @@ function getTeacherContent(teacherNameObj, teacherURL, resultCode) {
     });
 }
 
-function parseRatingData(htmlDoc, className) {
-    ratingElem = htmlDoc.getElementsByClassName(className)[0];
-    return (ratingElem ? ratingElem.innerText.trim() : '_');
+function parseMetricData(htmlDoc, metricId) {
+    let metricData = JSON.parse(htmlDoc.getElementById(metricId).getAttribute('data-ratings'));
+    let metricStarSum = 0;
+    let metricStarCount = 0;
+    for (let i = 0; i < 5; i++) {
+        metricStarSum += (i+1)*metricData[i]['value'];
+        metricStarCount += metricData[i]['value'];
+    }
+    let metricAverage = metricStarSum/metricStarCount;
+    return (metricAverage ? (Math.round(metricAverage*10)/10).toFixed(1)+' ★' : '_');
 }
 
 function updateTeacherElementsWithRating(teacherNameObj, teacherURL, rating) {
@@ -337,7 +341,7 @@ function updateSavedTeacherRatings(teacherNameObj, teacherURL, content, code) {
     }
 }
 
-function createRatingsRow(teacherKey) {
+function createRatingsRow(teacherNameObj) {
 
     const ratingsRow = document.createElement('li');
     ratingsRow.className = 'row';
@@ -356,9 +360,9 @@ function createRatingsRow(teacherKey) {
     ratingsButton.setAttribute('type', 'button');
     ratingsButton.setAttribute("onclick", fetchRatings.toString() +  " fetchRatings();");
     ratingsButton.className = 'btn btn-sm btn-default';
-    ratingsButton.innerText = 'Fetch Ratings with Dawson Enhanced';
-    ratingsButton.title = 'Click to load ratings for this teacher.';
-    ratingsButton.value = teacherKey;
+    ratingsButton.innerText = 'Find ratings for ' + teacherNameObj.fullName + ' with Dawson Enhanced';
+    ratingsButton.title = 'Click to find ratings for this teacher.';
+    ratingsButton.value = teacherNameObj.fullNameKey;
     ratingsDiv.append(ratingsButton);
 
     return ratingsRow;
@@ -388,15 +392,15 @@ function generateNewTabLink(url, message) {
 function generateRatingsContentElem(teacherURL, rating) {
 
     const ratingsDiv = document.createElement('div');
-    ratingsDiv.class = 'ratings-summary';
+    ratingsDiv.className = 'ratings-summary';
     ratingsDiv.style = 'line-height: 1.6';
 
-    ratingsLinkMessage = rating.fullName + ': <b>' + rating.overall + '</b> average based on ' + rating.numOfRatings + ' professor rating' + (rating.numOfRatings > 1 ? 's.' : '.');
+    ratingsLinkMessage = '✔️ Data found for <b>' + rating.fullName + '</b> based on ' + rating.numOfRatings + ' teacher rating' + (rating.numOfRatings > 1 ? 's:' : ':');
     const ratingsLink = generateNewTabLink(teacherURL, ratingsLinkMessage);
     ratingsDiv.appendChild(ratingsLink);
 
     const ratingsTable = document.createElement('table');
-    ratingsTable.class = 'ratings-table';
+    ratingsTable.className = 'ratings-table';
     ratingsTable.style.tableLayout = 'fixed';
     ratingsTable.style.lineHeight = '1';
     ratingsDiv.appendChild(ratingsTable);

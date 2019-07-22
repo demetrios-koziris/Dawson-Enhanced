@@ -2,14 +2,13 @@
   "name": "Dawson Enhanced",
   "author": "kozirisdev",
   "manifest_version": 2,
-  "version": "2018.08.08.0",
+  "version": "2019.06.14.0",
   "description": "Integrate teacher ratings and course seat availability into the Dawson Timetable and Registration Guide",
   "permissions" : [
     "declarativeContent",
-    "*://timetable.dawsoncollege.qc.ca/*",
-    "*://myintranet.dawsoncollege.qc.ca/*",
-    "*://dawsoncollege.omnivox.ca/*", 
-    "*://ca.ratemyteachers.com/*"
+    "*://*.dawsoncollege.qc.ca/*",
+    "*://*.dawsoncollege.omnivox.ca/*", 
+    "*://*.ratemyteachers.com/*"
   ],
   "background": {
     "scripts": [ "js/backgroundHTTP.js" ],
@@ -29,10 +28,9 @@
   "content_scripts" : [
     {
       "matches" : [
-        "*://timetable.dawsoncollege.qc.ca/*",
-        "*://myintranet.dawsoncollege.qc.ca/*",
-        "*://dawsoncollege.omnivox.ca/*", 
-        "*://ca.ratemyteachers.com/*"
+        "*://*.dawsoncollege.qc.ca/*",
+        "*://*.dawsoncollege.omnivox.ca/*", 
+        "*://*.ratemyteachers.com/*"
       ],
       "js" : [
         "lib/jquery-1.11.2.min.js", 
